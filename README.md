@@ -7,10 +7,10 @@ ALL CONTENT IN THIS REPO NOT AUTHORED BY THE OWNER OF THE REPO IS THE PROPERTY O
 ```
 This application is based on the efforts of Peter Dolkens (unp4k).
 Full credit goes to him for creating the orignal code bases that this application utilises 
-and re-implements. See below for full information about his and other inspiring Star Citizen projects.
+and re-implements. See below for full information about his inspiring Star Citizen project.
 ```
 ## So what is it?
-The Star Citizen HAL Extractor (HAL X for short) is a windows application that can extract game data from the `.p4k` game file of Star Citizen and output xml, graphic and any other data within the p4k data file, for use in external programs.
+The Star Citizen HAL Extractor (HAL X for short) is a windows application that can extract game data from the `.p4k` game file of Star Citizen and output xml, graphic and any other data within the `.p4k` data file, for use in external programs.
 
 ## Development Installation
 * Fork this repo if you want to play around with the code (and improve it)
