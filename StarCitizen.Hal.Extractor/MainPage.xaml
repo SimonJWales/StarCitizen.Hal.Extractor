@@ -19,8 +19,8 @@
                      Command="{Binding SelectExtractToPathSelectionClickedCommand}"
                      IsEnabled="{Binding AreWeNotExtracting}"/>
 
-        <ToolbarItem Text="Extract" 
-            Command="{Binding ResetExtractionListCommandadd reset}" />
+        <ToolbarItem Text="Reset" 
+            Command="{Binding ResetExtractionListCommand}" />
         
         <ToolbarItem Text="Extract" 
             Command="{Binding BeginExtractingCommand}" />
