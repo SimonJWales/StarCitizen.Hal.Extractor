@@ -35,7 +35,20 @@ namespace Hal.Extractor.Services
 
         public static readonly string ExtractToRegistryName = @"ExtractedPath";
 
+        public static readonly string ExtractTypesXML = "";
+
+        public static readonly string ExtractTypesImages = "";
+
+        public static readonly string ExtractTypesAll = "ALL (Warning - many minutes)";
+        
         public static readonly string[] AssetSeparator = ["\r\n", "\r", "\n"];
+
+        public static readonly List<string> DefaultTypes =
+        [
+            "Default XML",
+            "Default Images",
+            "ALL (Warning - many minutes)"
+        ];
 
         public static readonly List<string> DefaultXMLExtensions =
         [

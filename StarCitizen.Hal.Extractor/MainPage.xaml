@@ -20,6 +20,9 @@
                      IsEnabled="{Binding AreWeNotExtracting}"/>
 
         <ToolbarItem Text="Extract" 
+            Command="{Binding ResetExtractionListCommandadd reset}" />
+        
+        <ToolbarItem Text="Extract" 
             Command="{Binding BeginExtractingCommand}" />
 
     </ContentPage.ToolbarItems>

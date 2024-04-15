@@ -127,6 +127,17 @@ namespace StarCitizen.Hal.Extractor.ViewModels
         }
 
         [RelayCommand]
+        void ResetExtractionList()
+        {
+            if (AreWeExtracting)
+            {
+                return;
+            }
+
+            ObservedFileTypes!.Clear();
+        }
+
+        [RelayCommand]
         void OnExtensionTypeClicked(object parameter)
         {
             if (AreWeExtracting)
@@ -148,7 +159,7 @@ namespace StarCitizen.Hal.Extractor.ViewModels
 
             ClearUpdateInfoText();
 
-            if (extension == "Default XML")
+            if (extension == Parameters.DefaultTypes[0])
             {
                 foreach (var item in Parameters.DefaultXMLExtensions)
                 {
@@ -161,11 +172,25 @@ namespace StarCitizen.Hal.Extractor.ViewModels
                 return;
             }
 
-            if (extension == "Default Images")
+            if (extension == Parameters.DefaultTypes[1])
             {
                 foreach (var item in Parameters.DefaultImageExtensions)
                 {
                     if (!ObservedFileTypes!.Contains(item))
+                    {
+                        ObservedFileTypes.Add(item);
+                    }
+                }
+
+                return;
+            }
+
+            if (extension == Parameters.DefaultTypes[2])
+            {
+                foreach (var item in ObservedExtensions)
+                {
+                    if (!ObservedFileTypes!.Contains(item) &&
+                        !Parameters.DefaultTypes.Contains(item))
                     {
                         ObservedFileTypes.Add(item);
                     }
@@ -356,9 +381,10 @@ namespace StarCitizen.Hal.Extractor.ViewModels
                 return;
             }
 
-            ObservedExtensions.Add("Default XML");
-
-            ObservedExtensions.Add("Default Images");
+            foreach (var item in Parameters.DefaultTypes)
+            {
+                ObservedExtensions.Add(item);
+            }
 
             foreach (var item in extensions!.OrderBy(o => o))
             {
