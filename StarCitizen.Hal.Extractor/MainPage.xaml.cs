@@ -1,25 +1,31 @@
-﻿namespace StarCitizen.Hal.Extractor
+﻿using Hal.Extractor.Services;
+using StarCitizen.Hal.Extractor.ViewModels;
+
+namespace StarCitizen.Hal.Extractor
 {
     public partial class MainPage : ContentPage
     {
-        int count = 0;
+        AppState? AppState { get; set; }
 
-        public MainPage()
+        public MainPage(
+            MainPageViewModel viewModel, 
+            AppState appState)
         {
             InitializeComponent();
-        }
 
-        private void OnCounterClicked(object sender, EventArgs e)
-        {
-            count++;
+            AppState = appState;
 
-            if (count == 1)
-                CounterBtn.Text = $"Clicked {count} time";
-            else
-                CounterBtn.Text = $"Clicked {count} times";
+            BindingContext = viewModel;
 
-            SemanticScreenReader.Announce(CounterBtn.Text);
+            AppState!.FileCountHasChanged = () =>
+            {
+                viewModel.FilesExtracted = AppState.FileCount;
+            };
+
+            AppState!.ConvertedCountHasChanged = () =>
+            {
+                viewModel.FilesConverted = AppState.ConvertedCount;
+            };
         }
     }
-
 }

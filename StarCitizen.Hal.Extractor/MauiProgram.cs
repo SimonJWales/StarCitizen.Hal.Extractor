@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
+﻿
+using CommunityToolkit.Maui.Core;
+using Hal.Extractor.Services;
+using Microsoft.Extensions.Logging;
 
 namespace StarCitizen.Hal.Extractor
 {
@@ -9,6 +12,7 @@ namespace StarCitizen.Hal.Extractor
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
+                .UseMauiCommunityToolkitCore()
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -18,6 +22,18 @@ namespace StarCitizen.Hal.Extractor
 #if DEBUG
     		builder.Logging.AddDebug();
 #endif
+
+            builder.Services.AddSingleton<AppState>();
+
+            builder.Services.AddSingleton<FileService>();
+
+            builder.Services.AddSingleton<ExtractionService>();
+
+            builder.Services.AddSingleton<XMLCryExtraction>();
+
+            builder.Services.AddSingleton<MainPageViewModel>();
+
+            builder.Services.AddSingleton<MainPage>();
 
             return builder.Build();
         }
