@@ -44,6 +44,7 @@
 		<AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
 		<GenerateTestArtifacts>True</GenerateTestArtifacts>
 		<HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
+		<DefaultLanguage>en-gb</DefaultLanguage>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -84,10 +85,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="Libraries\Unforge\x64\libzstd.dll">
+	  <None Update="x64\libzstd.dll">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
-	  <None Update="Libraries\Unforge\x86\libzstd.dll">
+	  <None Update="x86\libzstd.dll">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
 	</ItemGroup>
