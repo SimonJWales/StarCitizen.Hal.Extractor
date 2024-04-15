@@ -20,9 +20,11 @@ The Star Citizen HAL Extractor (HAL X for short) is a windows application that c
 * Run the file and install to your device.
 
 ## How to (standalone version)
-* Open a Windows Command prompt, Terminal, Bash or whatever is your favourite command-line shell
-* CD into the location of the `StarCitizen.Builder.exe`
-* Run the exe with or without arguments (see below for which arguments are available)
+* Open the application in the same way you open any other app on your device.
+* Select the location of the `.p4k` data file
+* Select the output folder for the extracted data
+* Select the file types you want to extract
+* Hit the Extract button
 
 ## Why do we need this?
 While [unp4k](https://github.com/dolkensp/unp4k) is terrific at getting the data out from the `Data.p4k` file and outputing user friendly objects, it does not seem to be updated or maintained.
@@ -38,6 +40,7 @@ A complete extraction  (using default XML values) can take between 2 and 10 minu
 
 [unp4k](https://github.com/dolkensp/unp4k)
 
+
 ---
 
-![made-by-the-community-white-200](https://user-images.githubusercontent.com/44800187/210419931-50f91abd-6fc1-4135-bd62-0d84c496a5bc.png)
+![made-by-the-community-white-200](https://user-images.githubusercontent.com/44800187/210419931-50f91abd-6fc1-4135-bd62-0d84c496a5bc.png)  ![app_icon](https://github.com/SimonJWales/StarCitizen.Hal.Extractor/assets/44800187/962a408d-5c15-419d-9218-5768ddd033bf)
