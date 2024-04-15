@@ -2,6 +2,7 @@
 using CommunityToolkit.Maui.Core;
 using Hal.Extractor.Services;
 using Microsoft.Extensions.Logging;
+using StarCitizen.Hal.Extractor.ViewModels;
 
 namespace StarCitizen.Hal.Extractor
 {
