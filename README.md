@@ -1,4 +1,4 @@
-![HAL X](https://badgen.net/badge/StarCitizen/Builder/purple?icon=windows) ![Windows](https://badgen.net/badge/icon/windows?icon=windows&label) ![HAL X](https://badgen.net/release/SimonJWales/StarCitizen.Hal.Extractor) ![HAL X](https://badgen.net/licence/SimonJWales/StarCitizen.Hal.Extractor) ![HAL X](https://badgen.net/last-commit/SimonJWales/StarCitizen.Hal.Extractor) ![HAL X](https://badgen.net/releases/SimonJWales/StarCitizen.Hal.Extractor)
+![HAL X](https://badgen.net/badge/SC HAL/Extractor/purple?icon=windows) ![Windows](https://badgen.net/badge/icon/windows?icon=windows&label) ![HAL X](https://badgen.net/release/SimonJWales/StarCitizen.Hal.Extractor) ![HAL X](https://badgen.net/licence/SimonJWales/StarCitizen.Hal.Extractor) ![HAL X](https://badgen.net/last-commit/SimonJWales/StarCitizen.Hal.Extractor) ![HAL X](https://badgen.net/releases/SimonJWales/StarCitizen.Hal.Extractor)
 # Star Citizen Hal Extractor
 
 APP FOR DECOMPRESSING, EXTRACTING AND CONVERTING STAR CITIZEN GAME DATA FOR USE IN EXTERNAL APPLICATIONS.
