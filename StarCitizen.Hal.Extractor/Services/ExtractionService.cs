@@ -162,7 +162,7 @@ public class ExtractionService(AppState appState)
     /// <param name="entry"></param>
     /// <param name="buffer"></param>
     /// <returns></returns>
-    static async Task<bool> ExtractFile(
+    public static async Task<bool> ExtractFile(
         string filePath,
         ICSharpCode.SharpZipLib.Zip.ZipFile p4kArchive,
         ICSharpCode.SharpZipLib.Zip.ZipEntry entry,
@@ -247,7 +247,7 @@ public class ExtractionService(AppState appState)
     /// Get the key bytes for the archive
     /// </summary>
     /// <returns></returns>
-    static byte[] GetBytes()
+    public static byte[] GetBytes()
     {
         return [
             0x5E,

@@ -1,4 +1,5 @@
 ﻿
+using ICSharpCode.SharpZipLib.Zip;
 using System.Diagnostics;
 using System.Globalization;
 using System.Xml;
@@ -101,7 +102,13 @@ namespace Hal.Extractor.Services
                     return await ConvertDcbToXmlAsync(outputFile);
                 }
 
-                if (extension == ".xml")
+                if (extension == ".socpak")
+                {
+                    return UnSocpakAsync(outputFile);
+                }
+
+                if (extension == ".xml" ||
+                    extension == ".entxml")
                 {
                     return await ProcessXmlFileAsync(outputFile);
                 }
@@ -117,6 +124,77 @@ namespace Hal.Extractor.Services
                 Debug.WriteLine($"Smelt extraction file error {outputFile}: {ex}");
 
                 return false;
+            }
+
+            return true;
+        }
+
+        static bool UnSocpakAsync(string socpakFile)
+        {
+            string directory = Path.GetDirectoryName(socpakFile)!;
+
+            string fileNameWithoutExt = $"{Path.GetFileNameWithoutExtension(socpakFile)}-socpak";
+
+            // combine them to get the full path without extension
+            string newSocpakOutputPath = Path.Combine(
+                directory,
+                fileNameWithoutExt);
+
+            ZipFile? zipFile = null;
+
+            try
+            {
+                FileStream fs = File.OpenRead(socpakFile);
+
+                zipFile = new ZipFile(fs);
+
+                foreach (ZipEntry zipEntry in zipFile)
+                {
+                    if (!zipEntry.IsFile)
+                    {
+                        continue;
+                    }
+                    
+                    string entryFileName = zipEntry.Name;
+
+                    // adjust directory separators to match the operating system
+                    entryFileName = entryFileName.Replace(
+                        '/', 
+                        Path.DirectorySeparatorChar);
+
+                    byte[] buffer = new byte[4096];
+
+                    Stream zipStream = zipFile.GetInputStream(zipEntry);
+
+                    // create full directory path
+                    string fullZipToPath = Path.Combine(
+                        newSocpakOutputPath, 
+                        entryFileName);
+
+                    string directoryName = Path.GetDirectoryName(fullZipToPath)!;
+
+                    if (directoryName.Length > 0)
+
+                        Directory.CreateDirectory(directoryName);
+
+                    using FileStream streamWriter = File.Create(fullZipToPath);
+
+                    ICSharpCode.SharpZipLib.Core.StreamUtils.Copy(
+                        zipStream, 
+                        streamWriter, 
+                        buffer);
+                }
+            }
+            finally
+            {
+                if (zipFile != null)
+                {
+                    // close also closes the underlying stream
+                    zipFile.IsStreamOwner = true;
+
+                    // release resources
+                    zipFile.Close();
+                }
             }
 
             return true;
