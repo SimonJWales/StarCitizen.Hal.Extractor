@@ -31,15 +31,9 @@ namespace Hal.Extractor.Services
 
         public static readonly string ExtensionsFile = "Extensions.txt";
 
-        public static readonly string ExtractFromRegistryName = "P4KPath";
+        public static readonly string ExtractFromPreference = "P4KPath";
 
-        public static readonly string ExtractToRegistryName = @"ExtractedPath";
-
-        public static readonly string ExtractTypesXML = "";
-
-        public static readonly string ExtractTypesImages = "";
-
-        public static readonly string ExtractTypesAll = "ALL (Warning - many minutes)";
+        public static readonly string ExtractToPreference = "ExtractedPath";
         
         public static readonly string[] AssetSeparator = ["\r\n", "\r", "\n"];
 
