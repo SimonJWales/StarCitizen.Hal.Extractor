@@ -1,5 +1,4 @@
 ﻿
-using Hal.Extractor.Entities;
 using System.Globalization;
 
 namespace Hal.Extractor.Services
