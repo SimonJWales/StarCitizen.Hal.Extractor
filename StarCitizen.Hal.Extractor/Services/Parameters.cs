@@ -45,7 +45,6 @@ namespace Hal.Extractor.Services
 
         public static readonly List<string> DefaultXMLExtensions =
         [
-            //".obj",
             ".ini",
             ".dcb",
             ".xml",

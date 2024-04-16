@@ -502,7 +502,7 @@ namespace unforge
             {
                 Directory.Delete(path, true);
 
-                // TODO: rework as async wait on completion
+                //  comment: rework as async wait on completion
                 while (Directory.Exists(path))
                 {
                     Thread.Sleep(100);
