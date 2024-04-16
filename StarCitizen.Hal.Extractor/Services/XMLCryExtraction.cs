@@ -97,18 +97,19 @@ namespace Hal.Extractor.Services
 
                 string extension = Path.GetExtension(outputFile).ToLowerInvariant();
 
-                if (extension == ".dcb")
+                if (extension is ".dcb")
                 {
                     return await ConvertDcbToXmlAsync(outputFile);
                 }
 
-                if (extension == ".socpak")
+                if (extension is ".socpak")
                 {
                     return UnSocpakAsync(outputFile);
                 }
 
-                if (extension == ".xml" ||
-                    extension == ".entxml")
+                if (extension is ".xml" ||
+                    extension is ".entxml" ||
+                    extension is ".bspace")
                 {
                     return await ProcessXmlFileAsync(outputFile);
                 }
@@ -252,9 +253,19 @@ namespace Hal.Extractor.Services
 
                 XmlDocument xml = CryXmlSerializer.ReadFile(outputFile);
 
-                string xmlPath = Path.ChangeExtension(
-                    outputFile,
-                    "xml");
+
+                string xmlPath = outputFile;
+
+                if (!Path.GetExtension(xmlPath).Equals(
+                    ".xml", 
+                    StringComparison.CurrentCultureIgnoreCase))
+                {
+                    xmlPath += ".xml";
+                }
+
+                //Path.ChangeExtension(
+                //    outputFile,
+                //    "xml");
 
                 xml?.Save(xmlPath);
 
