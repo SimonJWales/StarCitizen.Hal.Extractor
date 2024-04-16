@@ -36,9 +36,9 @@ namespace StarCitizen.Hal.Extractor.ViewModels
                 await GetExtensions(Parameters.AssetSeparator);
             });
 
-            ExtractFromPath = FileService.ReadFromRegistry(Parameters.ExtractFromRegistryName);
+            ExtractFromPath = FileService.ReadPreference(Parameters.ExtractFromRegistryName);
 
-            ExtractToPath = FileService.ReadFromRegistry(Parameters.ExtractToRegistryName);
+            ExtractToPath = FileService.ReadPreference(Parameters.ExtractToRegistryName);
         }
 
         [RelayCommand]
@@ -259,7 +259,7 @@ namespace StarCitizen.Hal.Extractor.ViewModels
 
             ExtractFromPath = result.FullPath;
 
-            FileService.SaveToRegistry(
+            FileService.SavePreference(
                 Parameters.ExtractFromRegistryName!,
                 ExtractFromPath);
         }
@@ -276,7 +276,7 @@ namespace StarCitizen.Hal.Extractor.ViewModels
             {
                 ExtractToPath = result.Folder.Path;
 
-                FileService.SaveToRegistry(
+                FileService.SavePreference(
                     Parameters.ExtractToRegistryName!,
                     ExtractToPath);
             }

@@ -7,39 +7,20 @@ namespace Hal.Extractor.Services;
 
 public class FileService
 {
-    static readonly string _registryPath = @"Software\HAL Extractor";
-
-    public static void SaveToRegistry(
+    public static void SavePreference(
         string valuePath,
         string valueData)
     {
-        if (OperatingSystem.IsWindows())
-        {
-            using var key = Registry.CurrentUser.CreateSubKey(_registryPath);
-
-            key.SetValue(
-                valuePath,
-                valueData);
-        }
+        Preferences.Set(
+            valuePath, 
+            valueData);
     }
 
-    public static string? ReadFromRegistry(string valuePath)
+    public static string? ReadPreference(string valuePath)
     {
-        if (OperatingSystem.IsWindows())
-        {
-            using var key = Registry.CurrentUser.OpenSubKey(_registryPath);
-
-            if (key is null)
-            {
-                return string.Empty;
-            }
-
-            var value = key.GetValue(valuePath);
-
-            return value?.ToString();
-        }
-
-        return string.Empty;
+        return Preferences.Get(
+            valuePath, 
+            string.Empty);
     }
 
 
