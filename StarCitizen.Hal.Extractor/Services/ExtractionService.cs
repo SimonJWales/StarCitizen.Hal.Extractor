@@ -109,7 +109,7 @@ public class ExtractionService(AppState appState)
 
             // more elegant than a scrappy linq query
             bool isValidExtension = (from extensionType in fileTypes
-                                         where entry.Name.ToLower().EndsWith(
+                                         where entry.Name.ToLower().Contains(
                                              extensionType,
                                              StringComparison.CurrentCultureIgnoreCase)
                                          select true)

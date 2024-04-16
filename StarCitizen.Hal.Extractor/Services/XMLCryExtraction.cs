@@ -129,7 +129,7 @@ namespace Hal.Extractor.Services
         /// <returns></returns>
         static Task<bool> ConvertDcbToXmlAsync(string outputFile)
         {
-            return Task.Run(() =>
+            var task = Task.Run(() =>
             {
                 if (Parameters.CancelTokenSource.IsCancellationRequested)
                 {
@@ -152,6 +152,10 @@ namespace Hal.Extractor.Services
 
                 return true;
             });
+
+            task.Wait();
+
+            return task;
         }
 
         /// <summary>
@@ -161,7 +165,7 @@ namespace Hal.Extractor.Services
         /// <returns></returns>
         static Task<bool> ProcessXmlFileAsync(string outputFile)
         {
-            return Task.Run(() =>
+            var task = Task.Run(() =>
             {
                 if (Parameters.CancelTokenSource.IsCancellationRequested)
                 {
@@ -178,6 +182,10 @@ namespace Hal.Extractor.Services
 
                 return xml != null;
             });
+
+            task.Wait();
+
+            return task;
         }
     }
 }
