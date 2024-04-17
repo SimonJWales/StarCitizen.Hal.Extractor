@@ -99,7 +99,9 @@ namespace Hal.Extractor.Services
 
                 if (extension is ".dcb")
                 {
-                    return await ConvertDcbToXmlAsync(outputFile);
+                    //return await ConvertDcbToXmlAsync(outputFile);
+
+                    return ConvertDcbToXml(outputFile);
                 }
 
                 if (extension is ".socpak")
@@ -111,7 +113,9 @@ namespace Hal.Extractor.Services
                     extension is ".entxml" ||
                     extension is ".bspace")
                 {
-                    return await ProcessXmlFileAsync(outputFile);
+                    //return await ProcessXmlFileAsync(outputFile);
+
+                    return ProcessXmlFile(outputFile);
                 }
             }
             catch (OperationCanceledException)
@@ -206,6 +210,35 @@ namespace Hal.Extractor.Services
         /// </summary>
         /// <param name="outputFile"></param>
         /// <returns></returns>
+        static bool ConvertDcbToXml(string outputFile)
+        {
+            if (Parameters.CancelTokenSource.IsCancellationRequested)
+            {
+                return false;
+            }
+
+            using var binaryReader = new BinaryReader(File.OpenRead(outputFile));
+
+            bool legacy = new FileInfo(outputFile).Length < 0x0e2e00;
+
+            DataForge dataForge = new(
+                binaryReader,
+                legacy);
+
+            string xmlPath = Path.ChangeExtension(
+                outputFile,
+                "xml");
+
+            dataForge.Save(xmlPath);
+
+            return true;
+        }
+
+        /// <summary>
+        /// Convert DCB files async to XML and save to disk
+        /// </summary>
+        /// <param name="outputFile"></param>
+        /// <returns></returns>
         static Task<bool> ConvertDcbToXmlAsync(string outputFile)
         {
             var task = Task.Run(() =>
@@ -239,6 +272,39 @@ namespace Hal.Extractor.Services
 
         /// <summary>
         /// Process XML files and save to disk
+        /// </summary>
+        /// <param name="outputFile"></param>
+        /// <returns></returns>
+        static bool ProcessXmlFile(string outputFile)
+        {
+            if (Parameters.CancelTokenSource.IsCancellationRequested)
+            {
+                return false;
+            }
+
+            XmlDocument xml = CryXmlSerializer.ReadFile(outputFile);
+
+
+            string xmlPath = outputFile;
+
+            if (!Path.GetExtension(xmlPath).Equals(
+                ".xml",
+                StringComparison.CurrentCultureIgnoreCase))
+            {
+                xmlPath += ".xml";
+            }
+
+            //Path.ChangeExtension(
+            //    outputFile,
+            //    "xml");
+
+            xml?.Save(xmlPath);
+
+            return xml != null;
+        }
+
+        /// <summary>
+        /// Process XML files async and save to disk
         /// </summary>
         /// <param name="outputFile"></param>
         /// <returns></returns>

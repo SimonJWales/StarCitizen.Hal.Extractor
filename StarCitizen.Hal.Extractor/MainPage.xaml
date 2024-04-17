@@ -186,6 +186,17 @@
                 Grid.Row="1"
                 Grid.RowSpan="2"/>
 
+            <Label Text="{Binding AppVersion}" 
+                   IsVisible="{Binding AreWeNotExtracting}"
+                   FontSize="Caption" 
+                   TextColor="{AppThemeBinding 
+                        Light={StaticResource Secondary}, 
+                        Dark={ StaticResource SecondaryDark}}"
+                   VerticalTextAlignment="Center" 
+                   HorizontalTextAlignment="Start"
+                   Grid.Column="0"
+                   Grid.Row="2" />
+
             <ActivityIndicator IsVisible="{Binding AreWeExtracting}" 
                                IsRunning="{Binding AreWeExtracting}" 
                                VerticalOptions="FillAndExpand"

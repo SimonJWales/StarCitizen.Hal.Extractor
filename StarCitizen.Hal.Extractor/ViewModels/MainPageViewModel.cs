@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using Hal.Extractor.Services;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace StarCitizen.Hal.Extractor.ViewModels
 {
@@ -21,6 +22,8 @@ namespace StarCitizen.Hal.Extractor.ViewModels
 
         Timer? UiTimer { get; set; }
 
+        public string AppVersion { get; set; }
+
         public MainPageViewModel(
             ExtractionService extractionService,
             XMLCryExtraction xMLCryExtraction)
@@ -30,6 +33,10 @@ namespace StarCitizen.Hal.Extractor.ViewModels
             XMLCryExtraction = xMLCryExtraction;
 
             Title = Parameters.Title;
+
+            GetVersion();
+
+            ResetUpdateInfoText();
 
             Task.Run(async () =>
             {
@@ -157,7 +164,7 @@ namespace StarCitizen.Hal.Extractor.ViewModels
                 return;
             }
 
-            ClearUpdateInfoText();
+            ResetUpdateInfoText();
 
             if (extension == Parameters.DefaultTypes[0])
             {
@@ -228,7 +235,7 @@ namespace StarCitizen.Hal.Extractor.ViewModels
                 return;
             }
 
-            ClearUpdateInfoText();
+            ResetUpdateInfoText();
 
             ObservedFileTypes.Remove(extension);
         }
@@ -338,7 +345,7 @@ namespace StarCitizen.Hal.Extractor.ViewModels
         {
             AreWeExtracting = true;
 
-            ClearUpdateInfoText();
+            ResetUpdateInfoText();
 
             FilesExtracted = 0;
 
@@ -392,11 +399,31 @@ namespace StarCitizen.Hal.Extractor.ViewModels
             }
         }
 
-        void ClearUpdateInfoText()
+        /// <summary>
+        /// Clear the information text and reset to product version
+        /// </summary>
+        void ResetUpdateInfoText()
         {
             UpdateInfoText = "";
 
             AreNewExtensionsFound = false;
+        }
+
+        /// <summary>
+        /// Get the version number from the assembly
+        /// </summary>
+        /// <returns></returns>
+        void GetVersion()
+        {
+            var version = Assembly.GetExecutingAssembly().GetName().Version;
+
+            if (version is null ||
+                string.IsNullOrWhiteSpace(version?.ToString()))
+            {
+                AppVersion = "v0.0.1a";
+            }
+
+            AppVersion = $"v{version!.Major}.{version!.Minor}.{version!.Build}";
         }
     }
 }

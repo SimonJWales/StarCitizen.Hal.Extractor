@@ -1,5 +1,6 @@
 ﻿using Hal.Extractor.Services;
 using StarCitizen.Hal.Extractor.ViewModels;
+using System.Reflection;
 
 namespace StarCitizen.Hal.Extractor
 {
