@@ -166,38 +166,31 @@ namespace StarCitizen.Hal.Extractor.ViewModels
 
             ResetUpdateInfoText();
 
-            if (extension == Parameters.DefaultTypes[0])
+            if (Parameters.Defaults.TryGetValue(
+                extension, 
+                out List<string>? values))
             {
-                foreach (var item in Parameters.DefaultXMLExtensions)
+                // are we trying to add all extensions?
+                if (extension.StartsWith("ALL"))
                 {
-                    if (!ObservedFileTypes!.Contains(item))
+                    ObservedFileTypes!.Clear();
+
+                    foreach (var item in ObservedExtensions!)
                     {
+                        if (item.StartsWith("ALL"))
+                        {
+                            continue;
+                        }
+
                         ObservedFileTypes.Add(item);
                     }
+
+                    return;
                 }
 
-                return;
-            }
-
-            if (extension == Parameters.DefaultTypes[1])
-            {
-                foreach (var item in Parameters.DefaultImageExtensions)
+                foreach (var item in values)
                 {
                     if (!ObservedFileTypes!.Contains(item))
-                    {
-                        ObservedFileTypes.Add(item);
-                    }
-                }
-
-                return;
-            }
-
-            if (extension == Parameters.DefaultTypes[2])
-            {
-                foreach (var item in ObservedExtensions)
-                {
-                    if (!ObservedFileTypes!.Contains(item) &&
-                        !Parameters.DefaultTypes.Contains(item))
                     {
                         ObservedFileTypes.Add(item);
                     }
@@ -241,7 +234,7 @@ namespace StarCitizen.Hal.Extractor.ViewModels
         }
 
         [RelayCommand]
-        async Task OnSelectExtractionPathSelectionClickedAsync()
+        async Task OnExtractionPathSelectionClickedAsync()
         {
             var customFileType = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>>
         {
@@ -272,7 +265,7 @@ namespace StarCitizen.Hal.Extractor.ViewModels
         }
 
         [RelayCommand]
-        private async Task OnSelectExtractToPathSelectionClickedAsync()
+        private async Task OnOutputToPathSelectionClickedAsync()
         {
 #pragma warning disable CA1416 // Validate platform compatibility
             var result = await FolderPicker.Default.PickAsync();
@@ -287,18 +280,6 @@ namespace StarCitizen.Hal.Extractor.ViewModels
                     Parameters.ExtractToPreference!,
                     ExtractToPath);
             }
-        }
-
-        private void StopTheClock()
-        {
-            _stopwatch!.Stop();
-
-            // stop updating the UI timer
-            UiTimer?.Change(
-                Timeout.Infinite,
-                Timeout.Infinite);
-
-            AreWeExtracting = false;
         }
 
         async Task<List<string>?> Extract()
@@ -316,6 +297,23 @@ namespace StarCitizen.Hal.Extractor.ViewModels
             return extractedFiles;
         }
 
+        void StopTheClock()
+        {
+            _stopwatch!.Stop();
+
+            // stop updating the UI timer
+            UiTimer?.Change(
+                Timeout.Infinite,
+                Timeout.Infinite);
+
+            AreWeExtracting = false;
+        }
+
+        /// <summary>
+        /// Loop through the returned list of extensions and compare 
+        /// against the observed extensions for any new ones
+        /// </summary>
+        /// <param name="extensions"></param>
         void CheckForNewExtensions(List<string> extensions)
         {
             if (extensions?.Count > 0)
@@ -362,10 +360,22 @@ namespace StarCitizen.Hal.Extractor.ViewModels
                 1000);  // set interval to 1 second
         }
 
+        /// <summary>
+        /// Get the extensions list from the internal resource file
+        /// </summary>
+        /// <param name="separator"></param>
+        /// <returns></returns>
         async Task GetExtensions(string[] separator)
         {
             ObservedExtensions!.Clear();
 
+            // get the default extensions helper
+            foreach (var item in Parameters.Defaults.Keys)
+            {
+                ObservedExtensions.Add(item);
+            }
+
+            // open file and read all extensions
             using var stream = await FileSystem.OpenAppPackageFileAsync(Parameters.ExtensionsFile);
 
             using var reader = new StreamReader(stream);
@@ -386,11 +396,6 @@ namespace StarCitizen.Hal.Extractor.ViewModels
             if (extensions?.Count == 0)
             {
                 return;
-            }
-
-            foreach (var item in Parameters.DefaultTypes)
-            {
-                ObservedExtensions.Add(item);
             }
 
             foreach (var item in extensions!.OrderBy(o => o))

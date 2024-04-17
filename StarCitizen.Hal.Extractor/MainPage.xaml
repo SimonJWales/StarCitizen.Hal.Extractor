@@ -12,11 +12,11 @@
 
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Data.p4k" 
-                     Command="{Binding SelectExtractionPathSelectionClickedCommand}"
+                     Command="{Binding ExtractionPathSelectionClickedCommand}"
                      IsEnabled="{Binding AreWeNotExtracting}"/>
 
         <ToolbarItem Text="Output folder" 
-                     Command="{Binding SelectExtractToPathSelectionClickedCommand}"
+                     Command="{Binding OutputToPathSelectionClickedCommand}"
                      IsEnabled="{Binding AreWeNotExtracting}"/>
 
         <ToolbarItem Text="Reset" 

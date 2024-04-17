@@ -15,9 +15,9 @@ namespace Hal.Extractor.Services
         };
 
         public static CultureInfo? CultureInfo { get; set; } = new("en-GB");
-         
+
         public static readonly string CultureSeparate = ".";
-         
+
         public static readonly NumberFormatInfo NumberFormater = (NumberFormatInfo)NumberFormatInfo.CurrentInfo.Clone();
 
         public static readonly string Title = "HAL Extractor";
@@ -33,35 +33,54 @@ namespace Hal.Extractor.Services
         public static readonly string ExtractFromPreference = "P4KPath";
 
         public static readonly string ExtractToPreference = "ExtractedPath";
-        
+
         public static readonly string[] AssetSeparator = ["\r\n", "\r", "\n"];
 
-        public static readonly List<string> DefaultTypes =
-        [
-            "Default XML",
-            "Default Images",
-            "ALL (Warning - many minutes)"
-        ];
-
-        public static readonly List<string> DefaultXMLExtensions =
-        [
-            ".ini",
-            ".dcb",
-            ".xml",
-            ".txt",
-            ".json"
-        ];
-
-        public static readonly List<string> DefaultImageExtensions =
-        [
-            ".dds",
-            ".jpg",
-            ".jpeg",
-            ".png",
-            ".svg",
-            ".tif",
-            ".tiff",
-            ".img"
-        ];
+        public static readonly Dictionary<string, List<string>> Defaults = new()
+        {
+            {
+                "Default data", 
+                new List<string>
+                {
+                    ".dcb",
+                    ".ini",
+                    ".json",
+                    ".txt",
+                    ".xml"
+                }
+            },
+            {
+                "Images",
+                new List<string>
+                {
+                    ".dds",
+                    ".img",
+                    ".jpg",
+                    ".jpeg",
+                    ".png",
+                    ".svg",
+                    ".tif",
+                    ".tiff"
+                }
+            },
+            {
+                "Media (video/audio)",
+                new List<string>
+                {
+                    ".bk2",
+                    ".bnk",
+                    ".ogg",
+                    ".raw",
+                    ".svg",
+                    ".ttf",
+                    ".tiff",
+                    ".wem"
+                }
+            },
+            {
+                "ALL (warning - many minutes)",
+                new List<string>()
+            }
+        };
     }
 }
