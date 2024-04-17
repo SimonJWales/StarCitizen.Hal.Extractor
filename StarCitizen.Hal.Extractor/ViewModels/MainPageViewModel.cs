@@ -175,6 +175,14 @@ namespace StarCitizen.Hal.Extractor.ViewModels
                 {
                     ObservedFileTypes!.Clear();
 
+                    foreach (var item in ObservedExtensions)
+                    {
+                        if (!ObservedFileTypes!.Contains(item) &&
+                            !Parameters.Defaults.ContainsKey(item))
+                        {
+                            ObservedFileTypes.Add(item);
+                        }
+                    }
                     foreach (var item in ObservedExtensions!)
                     {
                         if (item.StartsWith("ALL"))
@@ -309,31 +317,6 @@ namespace StarCitizen.Hal.Extractor.ViewModels
             AreWeExtracting = false;
         }
 
-        /// <summary>
-        /// Loop through the returned list of extensions and compare 
-        /// against the observed extensions for any new ones
-        /// </summary>
-        /// <param name="extensions"></param>
-        void CheckForNewExtensions(List<string> extensions)
-        {
-            if (extensions?.Count > 0)
-            {
-                foreach (var item in extensions)
-                {
-                    if (!ObservedExtensions!.Contains(item))
-                    {
-                        // new item extension found
-                        AreNewExtensionsFound = true;
-                    }
-
-                    if (AreNewExtensionsFound)
-                    {
-                        break;
-                    }
-                }
-            }
-        }
-
         void OnTimerElapsed(object? state)
         {
             ExtractionTimer = _stopwatch!.Elapsed.ToString(@"hh\:mm\:ss");
@@ -405,7 +388,32 @@ namespace StarCitizen.Hal.Extractor.ViewModels
         }
 
         /// <summary>
-        /// Clear the information text and reset to product version
+        /// Loop through the returned list of extensions and compare 
+        /// against the observed extensions for any new ones
+        /// </summary>
+        /// <param name="extensions"></param>
+        void CheckForNewExtensions(List<string> extensions)
+        {
+            if (extensions?.Count > 0)
+            {
+                foreach (var item in extensions)
+                {
+                    if (!ObservedExtensions!.Contains(item))
+                    {
+                        // new item extension found
+                        AreNewExtensionsFound = true;
+                    }
+
+                    if (AreNewExtensionsFound)
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Clear the information text
         /// </summary>
         void ResetUpdateInfoText()
         {
