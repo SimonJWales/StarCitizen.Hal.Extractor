@@ -17,8 +17,8 @@ The Star Citizen HAL Extractor (HAL X for short) is a windows application that c
 * Fork this repo if you want to play around with the code (and improve it)
 
 ## General Installation (standalone version)
-* Download the latest version of [HAL Extractor from the Microsoft Windows Store](https://sc-hal.com/hal-x/latest)
-* Once installed, you can find the application in the apps list, as usual.
+* Download the latest version of [HAL Extractor from the Microsoft Windows Store](https://www.microsoft.com/store/productId/9NFJWG6RNXRP?ocid=pdpshare)
+* Once installed, you can find the application in the apps list, as usual; Start > All > H > HAL Extractor
 
 ## How to (standalone version)
 * Open the application in the same way you open any other app on your device.
@@ -39,7 +39,7 @@ A complete extraction (using default XML values) can take between 2 and 10 minut
 ---
 
 # Project links
-[HAL Extractor from the Microsoft Windows Store](https://sc-hal.com/hal-x/latest)
+[HAL Extractor from the Microsoft Windows Store](https://www.microsoft.com/store/productId/9NFJWG6RNXRP?ocid=pdpshare)
 
 [unp4k](https://github.com/dolkensp/unp4k)
 
