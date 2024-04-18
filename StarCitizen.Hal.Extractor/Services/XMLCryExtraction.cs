@@ -48,6 +48,8 @@ namespace Hal.Extractor.Services
 
                         bool savedOK = await SmeltAsync(file);
 
+                        //bool savedOK = Smelt(file);
+
                         if (savedOK)
                         {
                             Interlocked.Increment(ref successfullConversions);
@@ -85,7 +87,7 @@ namespace Hal.Extractor.Services
         /// </summary>
         /// <param name="outputFile"></param>
         /// <returns></returns>
-        static async Task<bool> SmeltAsync(
+        static bool Smelt(
             string outputFile)
         {
             try
@@ -122,11 +124,65 @@ namespace Hal.Extractor.Services
             {
                 Debug.WriteLine($"Smelt extraction was canceled while processing {outputFile}");
 
-                return false;  // Indicate that the operation was canceled
+                return false;
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Smelt extraction file error {outputFile}: {ex}");
+
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Convert files that are CryXML types and DCB files to a readable file format
+        /// </summary>
+        /// <param name="outputFile"></param>
+        /// <returns></returns>
+        static async Task<bool> SmeltAsync(
+            string outputFile)
+        {
+            try
+            {
+                if (Parameters.CancelTokenSource.IsCancellationRequested)
+                {
+                    return false;
+                }
+
+                string extension = Path.GetExtension(outputFile).ToLowerInvariant();
+
+                if (extension is ".dcb")
+                {
+                    //return await ConvertDcbToXmlAsync(outputFile);
+
+                    return await ConvertDcbToXmlAsync(outputFile);
+                }
+
+                if (extension is ".socpak")
+                {
+                    return UnSocpakAsync(outputFile);
+                }
+
+                if (extension is ".xml" ||
+                    extension is ".entxml" ||
+                    extension is ".bspace")
+                {
+                    //return await ProcessXmlFileAsync(outputFile);
+
+                    return await ProcessXmlFileAsync(outputFile);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                Debug.WriteLine($"SmeltAsync extraction was canceled while processing {outputFile}");
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SmeltAsync extraction file error {outputFile}: {ex}");
 
                 return false;
             }
