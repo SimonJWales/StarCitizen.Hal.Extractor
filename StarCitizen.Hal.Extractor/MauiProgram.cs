@@ -2,6 +2,7 @@
 using CommunityToolkit.Maui.Core;
 using Hal.Extractor.Services;
 using Microsoft.Extensions.Logging;
+using StarCitizen.Hal.Extractor.Services;
 using StarCitizen.Hal.Extractor.ViewModels;
 
 namespace StarCitizen.Hal.Extractor
@@ -23,6 +24,13 @@ namespace StarCitizen.Hal.Extractor
 #if DEBUG
     		builder.Logging.AddDebug();
 #endif
+
+            builder.Services.AddSingleton<ILogger>(serviceProvider =>
+            {
+                var logPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+
+                return new Log(logPath);
+            });
 
             builder.Services.AddSingleton<AppState>();
 

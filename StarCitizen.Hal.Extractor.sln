@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarCitizen.Hal.Extractor", "StarCitizen.Hal.Extractor\StarCitizen.Hal.Extractor.csproj", "{AF3D86D7-2E83-4351-925C-9C56CDF9DFA0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarCitizen.Hal.Extractor", "StarCitizen.Hal.Extractor\StarCitizen.Hal.Extractor.csproj", "{AF3D86D7-2E83-4351-925C-9C56CDF9DFA0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarCitizen.Hal.Extractor.Tests", "StarCitizen.Hal.Extractor.Tests\StarCitizen.Hal.Extractor.Tests.csproj", "{AC1376A0-2812-4489-8DFF-1F0B6E115EF4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarCitizen.Hal.Extractor.Library", "StarCitizen.Hal.Extractor.Library\StarCitizen.Hal.Extractor.Library.csproj", "{C3A3637C-581C-41FA-AB9B-6F651C22E680}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,6 +21,14 @@ Global
 		{AF3D86D7-2E83-4351-925C-9C56CDF9DFA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AF3D86D7-2E83-4351-925C-9C56CDF9DFA0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AF3D86D7-2E83-4351-925C-9C56CDF9DFA0}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{AC1376A0-2812-4489-8DFF-1F0B6E115EF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC1376A0-2812-4489-8DFF-1F0B6E115EF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC1376A0-2812-4489-8DFF-1F0B6E115EF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC1376A0-2812-4489-8DFF-1F0B6E115EF4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3A3637C-581C-41FA-AB9B-6F651C22E680}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3A3637C-581C-41FA-AB9B-6F651C22E680}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3A3637C-581C-41FA-AB9B-6F651C22E680}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3A3637C-581C-41FA-AB9B-6F651C22E680}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
