@@ -37,5 +37,9 @@ namespace StarCitizen.Hal.Extractor.ViewModels
 
         [ObservableProperty]
         int filesConverted;
+
+        [ObservableProperty]
+        bool logErrors;
+
     }
 }

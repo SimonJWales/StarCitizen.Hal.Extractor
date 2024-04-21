@@ -4,9 +4,11 @@ using Hal.Extractor.Services;
 using Microsoft.Extensions.Logging;
 using StarCitizen.Hal.Extractor.Services;
 using StarCitizen.Hal.Extractor.ViewModels;
+using System.Runtime.Versioning;
 
 namespace StarCitizen.Hal.Extractor
 {
+    [SupportedOSPlatform("windows")]
     public static class MauiProgram
     {
         public static MauiApp CreateMauiApp()
@@ -25,12 +27,6 @@ namespace StarCitizen.Hal.Extractor
     		builder.Logging.AddDebug();
 #endif
 
-            builder.Services.AddSingleton<ILogger>(serviceProvider =>
-            {
-                var logPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-
-                return new Log(logPath);
-            });
 
             builder.Services.AddSingleton<AppState>();
 
@@ -43,6 +39,17 @@ namespace StarCitizen.Hal.Extractor
             builder.Services.AddSingleton<MainPageViewModel>();
 
             builder.Services.AddSingleton<MainPage>();
+
+            builder.Services.AddSingleton<ILogger>(serviceProvider =>
+            {
+                string logPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+
+                AppState appState = serviceProvider.GetRequiredService<AppState>();
+
+                return new Log(
+                    logPath, 
+                    appState);
+            });
 
             return builder.Build();
         }

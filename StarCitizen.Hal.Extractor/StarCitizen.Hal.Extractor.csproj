@@ -80,7 +80,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Libraries\SharpLib\" />
 	  <Folder Include="Resources\Splash\" />
 	</ItemGroup>
 

@@ -28,5 +28,18 @@ namespace Hal.Extractor.Services
         {
             ConvertedCountHasChanged?.Invoke();
         }
+
+        public Action? LogErrorStateHasChanged;
+        public bool LogErrorState { get; set; } = false;
+        public void SetErrorState(bool value)
+        {
+            LogErrorState = value;
+
+            NotifyLogErrorStateChanged();
+        }
+        void NotifyLogErrorStateChanged()
+        {
+            LogErrorStateHasChanged?.Invoke();
+        }
     }
 }

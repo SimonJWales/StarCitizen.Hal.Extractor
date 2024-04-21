@@ -2,13 +2,12 @@
 using ICSharpCode.SharpZipLib.Zip;
 using Microsoft.Extensions.Logging;
 using StarCitizen.Hal.Extractor.Library.Cry;
+using StarCitizen.Hal.Extractor.Library.Dolkens.Unforge;
 using StarCitizen.Hal.Extractor.Library.Enum;
-using StarCitizen.Hal.Extractor.Services;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using System.Xml;
-using unforge;
 
 namespace Hal.Extractor.Services
 {
@@ -76,7 +75,7 @@ namespace Hal.Extractor.Services
                     }
                     catch (OperationCanceledException)
                     {
-                        Log.LogInformation("CryXML extraction was canceled while parallel");
+                        //Log.LogInformation("CryXML extraction was canceled while parallel");
 
                         return;
                     }
@@ -133,9 +132,9 @@ namespace Hal.Extractor.Services
             }
             catch (OperationCanceledException)
             {
-                Log.LogInformation(
-                    "HalConverter was canceled while processing {file}", 
-                    file);
+                //Log.LogInformation(
+                //    "HalConverter was canceled while processing {file}", 
+                //    file);
 
                 return false;
             }
@@ -299,7 +298,6 @@ namespace Hal.Extractor.Services
                     break;
 
                 default:
-
                     Log.LogError(
                         "Unknown File Format: {header})",
                         header);
@@ -380,7 +378,7 @@ namespace Hal.Extractor.Services
             return endiness;
         }
 
-        static XmlDocument BuildXmlDocument(CryTable table)
+        XmlDocument BuildXmlDocument(CryTable table)
         {
             var xmlDoc = new XmlDocument();
 
@@ -390,11 +388,15 @@ namespace Hal.Extractor.Services
 
             if (table.CryNode?.Count == 0)
             {
+                Log.LogCritical("No nodes found in CryTable.");
+
                 throw new FormatException("No nodes found in CryTable.");
             }
 
             if (table.CryReference?.Count == 0)
             {
+                Log.LogCritical("No references found in CryTable.");
+
                 throw new FormatException("No references found in CryTable.");
             }
 
@@ -404,6 +406,8 @@ namespace Hal.Extractor.Services
 
                 if (string.IsNullOrWhiteSpace(nodeName))
                 {
+                    Log.LogCritical("Node name is empty or null");
+
                     throw new FormatException("Node name is empty or null.");
                 }
 
@@ -425,7 +429,7 @@ namespace Hal.Extractor.Services
                     {
                         element.SetAttribute(
                             table.Map?[attributeRef.NameOffset] ?? "",
-                            "BUGGED");
+                            "UNKNOWN");
                     }
                 }
 
@@ -438,7 +442,7 @@ namespace Hal.Extractor.Services
                 }
                 else
                 {
-                    element.AppendChild(xmlDoc.CreateCDataSection("BUGGED"));
+                    element.AppendChild(xmlDoc.CreateCDataSection("UNKNOWN"));
                 }
 
                 xmlMap[node.NodeID] = element;

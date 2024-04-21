@@ -161,7 +161,7 @@
         </Grid>
 
         <Grid ColumnDefinitions="100,50,*,*,*,*" 
-              RowDefinitions="*,*,*"
+              RowDefinitions="*,*,*,*"
               Grid.Row="4" 
               Margin="0,20,0,0">
 
@@ -271,6 +271,14 @@
                    HorizontalTextAlignment="End"
                    Grid.Column="5" 
                    Grid.Row="2" />
+
+            <Label Text="Errors found. Check log!"
+                   TextColor="{StaticResource Error}"
+                   IsVisible="{Binding LogErrors}"
+                   HorizontalOptions="CenterAndExpand"
+                   VerticalOptions="StartAndExpand"
+                   Grid.ColumnSpan="6"
+                   Grid.Row="3" />
 
         </Grid>
 

@@ -9,7 +9,7 @@ namespace StarCitizen.Hal.Extractor
         AppState? AppState { get; set; }
 
         public MainPage(
-            MainPageViewModel viewModel, 
+            MainPageViewModel viewModel,
             AppState appState)
         {
             InitializeComponent();
@@ -26,6 +26,19 @@ namespace StarCitizen.Hal.Extractor
             AppState!.ConvertedCountHasChanged = () =>
             {
                 viewModel.FilesConverted = AppState.ConvertedCount;
+            };
+
+            AppState!.LogErrorStateHasChanged = () =>
+            {
+                if (AppState!.LogErrorState)
+                {
+                    viewModel.LogErrors = true;
+                }
+
+                if (!AppState!.LogErrorState)
+                {
+                    viewModel.LogErrors = false;
+                }
             };
         }
     }

@@ -5,14 +5,18 @@ using Hal.Extractor.Services;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Reflection;
+using System.Runtime.Versioning;
 
 namespace StarCitizen.Hal.Extractor.ViewModels
 {
+    [SupportedOSPlatform("windows")]
     public partial class MainPageViewModel : BaseViewModel
     {
         ExtractionService? ExtractionService { get; }
 
         XMLCryExtraction XMLCryExtraction { get; }
+
+        AppState AppState { get; set; }
 
         public ObservableCollection<string>? ObservedFileTypes { get; } = [];
 
@@ -26,15 +30,18 @@ namespace StarCitizen.Hal.Extractor.ViewModels
 
         public MainPageViewModel(
             ExtractionService extractionService,
-            XMLCryExtraction xMLCryExtraction)
+            XMLCryExtraction xMLCryExtraction,
+            AppState appState)
         {
             ExtractionService = extractionService;
 
             XMLCryExtraction = xMLCryExtraction;
 
+            AppState = appState;
+
             Title = Parameters.Title;
 
-            GetVersion();
+            AppVersion = GetVersion();
 
             ResetUpdateInfoText();
 
@@ -51,6 +58,11 @@ namespace StarCitizen.Hal.Extractor.ViewModels
         [RelayCommand]
         async Task BeginExtractingAsync()
         {
+            if (AppState.LogErrorState)
+            {
+                AppState!.SetErrorState(false);
+            }
+
             bool okToProceed = OkToBeginExtracting();
 
             if (!okToProceed)
@@ -241,6 +253,7 @@ namespace StarCitizen.Hal.Extractor.ViewModels
             ObservedFileTypes.Remove(extension);
         }
 
+        [SupportedOSPlatform("windows")]
         [RelayCommand]
         async Task OnExtractionPathSelectionClickedAsync()
         {
@@ -272,12 +285,11 @@ namespace StarCitizen.Hal.Extractor.ViewModels
                 ExtractFromPath);
         }
 
+        [SupportedOSPlatform("windows")]
         [RelayCommand]
-        private async Task OnOutputToPathSelectionClickedAsync()
+        async Task OnOutputToPathSelectionClickedAsync()
         {
-#pragma warning disable CA1416 // Validate platform compatibility
             var result = await FolderPicker.Default.PickAsync();
-#pragma warning restore CA1416 // Validate platform compatibility
 
             if (result.IsSuccessful &&
                 !string.IsNullOrWhiteSpace(result.Folder?.Path))
@@ -426,7 +438,7 @@ namespace StarCitizen.Hal.Extractor.ViewModels
         /// Get the version number from the assembly
         /// </summary>
         /// <returns></returns>
-        void GetVersion()
+        string GetVersion()
         {
             var version = Assembly.GetExecutingAssembly().GetName().Version;
 
@@ -436,7 +448,7 @@ namespace StarCitizen.Hal.Extractor.ViewModels
                 AppVersion = "v0.0.1a";
             }
 
-            AppVersion = $"v{version!.Major}.{version!.Minor}.{version!.Build}";
+            return $"v{version!.Major}.{version!.Minor}.{version!.Build}";
         }
     }
 }

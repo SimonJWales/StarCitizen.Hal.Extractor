@@ -1,11 +1,16 @@
 ﻿
+using Hal.Extractor.Services;
 using Microsoft.Extensions.Logging;
 
 namespace StarCitizen.Hal.Extractor.Services
 {
-    public class Log(string path) : ILogger
+    public class Log(
+        string path, 
+        AppState? appstate) : ILogger
     {
         string _path = path;
+
+        AppState? _appState = appstate;
 
         readonly object _lock = new();
 
@@ -36,6 +41,11 @@ namespace StarCitizen.Hal.Extractor.Services
                 File.AppendAllText(
                     GetCurrentLogFilePath(), 
                     message + Environment.NewLine);
+            }
+
+            if (_appState!.LogErrorState is false)
+            {
+                _appState.SetErrorState(true);
             }
         }
 
