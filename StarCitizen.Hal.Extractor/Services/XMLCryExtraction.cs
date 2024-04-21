@@ -230,7 +230,7 @@ namespace Hal.Extractor.Services
             return (true, false);
         }
 
-        private static CryTable BuildCryTable(BinaryReader binaryReader, Endiness endiness, CryMeta meta)
+        static CryTable BuildCryTable(BinaryReader binaryReader, Endiness endiness, CryMeta meta)
         {
             return new()
             {
@@ -252,7 +252,7 @@ namespace Hal.Extractor.Services
             };
         }
 
-        private static CryMeta GetCryMeta(BinaryReader binaryReader, Endiness endiness)
+        static CryMeta GetCryMeta(BinaryReader binaryReader, Endiness endiness)
         {
             return new()
             {
@@ -341,7 +341,7 @@ namespace Hal.Extractor.Services
             return converted;
         }
 
-        private static short ReadBytesEndiness16(
+        static short ReadBytesEndiness16(
             BinaryReader binaryReader,
             Endiness endiness)
         {
@@ -581,6 +581,7 @@ namespace Hal.Extractor.Services
                 (_ = binaryReader.ReadChar()) != '\0')
             {
                 // do nothing inside the loop, just keep reading to advance the stream position.
+                // TODO: something more elegant than this...
             }
 
             // the BinaryReader is now positioned right after the null terminator, ready for further reading
