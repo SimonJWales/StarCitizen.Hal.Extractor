@@ -111,8 +111,6 @@ namespace Hal.Extractor.Services
 
                 if (extension is ".dcb")
                 {
-                    //return await ConvertDcbToXmlAsync(outputFile);
-
                     return await ConvertDcbToXmlAsync(file);
                 }
 
@@ -125,17 +123,13 @@ namespace Hal.Extractor.Services
                     extension is ".entxml" ||
                     extension is ".bspace")
                 {
-                    (bool savedOk, bool error) = HalXml(file);
+                    bool savedOk = HalXml(file);
 
                     return savedOk;
                 }
             }
             catch (OperationCanceledException)
             {
-                //Log.LogInformation(
-                //    "HalConverter was canceled while processing {file}", 
-                //    file);
-
                 return false;
             }
             catch (Exception ex)
@@ -152,7 +146,7 @@ namespace Hal.Extractor.Services
             return true;
         }
 
-        (bool, bool) HalXml(string file)
+        bool HalXml(string file)
         {
             using FileStream fs = new(
                 file,
@@ -167,7 +161,7 @@ namespace Hal.Extractor.Services
             if (isXML)
             {
                 // already an xml file (or not anything we want to decrpyt)
-                return (false, false);
+                return false;
             }
 
             if (peek != 'C')
@@ -177,7 +171,7 @@ namespace Hal.Extractor.Services
                     peek,
                     file);
 
-                return (false, true);
+                return false;
             }
 
             // read a Fixed-Length string from the stream
@@ -191,7 +185,7 @@ namespace Hal.Extractor.Services
 
             if (!isCryFile)
             {
-                return (false, false);
+                return false;
             }
 
             long headerLength = binaryReader.BaseStream.Position;
@@ -214,7 +208,7 @@ namespace Hal.Extractor.Services
                     "Failed to build CryTable for: {file}",
                     file);
 
-                return (false, true);
+                return false);
             }
 
             table.Map = table.CryData!
@@ -226,7 +220,7 @@ namespace Hal.Extractor.Services
 
             xml?.Save(file);
 
-            return (true, false);
+            return true;
         }
 
         static CryTable BuildCryTable(BinaryReader binaryReader, Endiness endiness, CryMeta meta)
@@ -676,116 +670,6 @@ namespace Hal.Extractor.Services
 
 
 
-
-
-        /// <summary>
-        /// Convert files that are CryXML types and DCB files to a readable file format
-        /// </summary>
-        /// <param name="outputFile"></param>
-        /// <returns></returns>
-        static bool Smelt(
-            string outputFile)
-        {
-            try
-            {
-                if (Parameters.CancelTokenSource.IsCancellationRequested)
-                {
-                    return false;
-                }
-
-                string extension = Path.GetExtension(outputFile).ToLowerInvariant();
-
-                if (extension is ".dcb")
-                {
-                    //return await ConvertDcbToXmlAsync(outputFile);
-
-                    return ConvertDcbToXml(outputFile);
-                }
-
-                if (extension is ".socpak")
-                {
-                    return UnSocpakAsync(outputFile);
-                }
-
-                if (extension is ".xml" ||
-                    extension is ".entxml" ||
-                    extension is ".bspace")
-                {
-                    //return await ProcessXmlFileAsync(outputFile);
-
-                    return ProcessXmlFile(outputFile);
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                Debug.WriteLine($"Smelt extraction was canceled while processing {outputFile}");
-
-                return false;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Smelt extraction file error {outputFile}: {ex}");
-
-                return false;
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// Convert files that are CryXML types and DCB files to a readable file format
-        /// </summary>
-        /// <param name="outputFile"></param>
-        /// <returns></returns>
-        static async Task<bool> SmeltAsync(
-            string outputFile)
-        {
-            try
-            {
-                if (Parameters.CancelTokenSource.IsCancellationRequested)
-                {
-                    return false;
-                }
-
-                string extension = Path.GetExtension(outputFile).ToLowerInvariant();
-
-                if (extension is ".dcb")
-                {
-                    //return await ConvertDcbToXmlAsync(outputFile);
-
-                    return await ConvertDcbToXmlAsync(outputFile);
-                }
-
-                if (extension is ".socpak")
-                {
-                    return UnSocpakAsync(outputFile);
-                }
-
-                if (extension is ".xml" ||
-                    extension is ".entxml" ||
-                    extension is ".bspace")
-                {
-                    //return await ProcessXmlFileAsync(outputFile);
-
-                    return await ProcessXmlFileAsync(outputFile);
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                Debug.WriteLine($"SmeltAsync extraction was canceled while processing {outputFile}");
-
-                return false;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"SmeltAsync extraction file error {outputFile}: {ex}");
-
-                return false;
-            }
-
-            return true;
-        }
-
         static bool UnSocpakAsync(string socpakFile)
         {
             string directory = Path.GetDirectoryName(socpakFile)!;
@@ -858,35 +742,6 @@ namespace Hal.Extractor.Services
         }
 
         /// <summary>
-        /// Convert DCB files to XML and save to disk
-        /// </summary>
-        /// <param name="outputFile"></param>
-        /// <returns></returns>
-        static bool ConvertDcbToXml(string outputFile)
-        {
-            if (Parameters.CancelTokenSource.IsCancellationRequested)
-            {
-                return false;
-            }
-
-            using var binaryReader = new BinaryReader(File.OpenRead(outputFile));
-
-            bool legacy = new FileInfo(outputFile).Length < 0x0e2e00;
-
-            DataForge dataForge = new(
-                binaryReader,
-                legacy);
-
-            string xmlPath = Path.ChangeExtension(
-                outputFile,
-                "xml");
-
-            dataForge.Save(xmlPath);
-
-            return true;
-        }
-
-        /// <summary>
         /// Convert DCB files async to XML and save to disk
         /// </summary>
         /// <param name="outputFile"></param>
@@ -915,79 +770,6 @@ namespace Hal.Extractor.Services
                 dataForge.Save(xmlPath);
 
                 return true;
-            });
-
-            task.Wait();
-
-            return task;
-        }
-
-        /// <summary>
-        /// Process XML files and save to disk
-        /// </summary>
-        /// <param name="outputFile"></param>
-        /// <returns></returns>
-        static bool ProcessXmlFile(string outputFile)
-        {
-            if (Parameters.CancelTokenSource.IsCancellationRequested)
-            {
-                return false;
-            }
-
-            XmlDocument xml = CryXmlSerializer.ReadFile(outputFile);
-
-
-            string xmlPath = outputFile;
-
-            if (!Path.GetExtension(xmlPath).Equals(
-                ".xml",
-                StringComparison.CurrentCultureIgnoreCase))
-            {
-                xmlPath += ".xml";
-            }
-
-            //Path.ChangeExtension(
-            //    outputFile,
-            //    "xml");
-
-            xml?.Save(xmlPath);
-
-            return xml != null;
-        }
-
-        /// <summary>
-        /// Process XML files async and save to disk
-        /// </summary>
-        /// <param name="outputFile"></param>
-        /// <returns></returns>
-        static Task<bool> ProcessXmlFileAsync(string outputFile)
-        {
-            var task = Task.Run(() =>
-            {
-                if (Parameters.CancelTokenSource.IsCancellationRequested)
-                {
-                    return false;
-                }
-
-                XmlDocument xml = CryXmlSerializer.ReadFile(outputFile);
-
-
-                string xmlPath = outputFile;
-
-                if (!Path.GetExtension(xmlPath).Equals(
-                    ".xml", 
-                    StringComparison.CurrentCultureIgnoreCase))
-                {
-                    xmlPath += ".xml";
-                }
-
-                //Path.ChangeExtension(
-                //    outputFile,
-                //    "xml");
-
-                xml?.Save(xmlPath);
-
-                return xml != null;
             });
 
             task.Wait();
