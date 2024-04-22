@@ -26,7 +26,7 @@
     <Color x:Key="Info">#3299ff</Color>
     <Color x:Key="Error">#ff0000</Color>
     <Color x:Key="Warning">#d4b772</Color>
-    <Color x:Key="Success">#00ff00</Color>
+    <Color x:Key="Success">#3299ff</Color>
     
 
     <Color x:Key="White">White</Color>
