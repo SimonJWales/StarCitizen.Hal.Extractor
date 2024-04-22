@@ -197,6 +197,7 @@ namespace Hal.Extractor.Services
             CryMeta meta = GetCryMeta(
                 binaryReader,
                 endiness);
+
             CryTable? table = BuildCryTable(
                 binaryReader, 
                 endiness, 
