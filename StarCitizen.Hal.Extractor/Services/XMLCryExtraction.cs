@@ -208,7 +208,7 @@ namespace Hal.Extractor.Services
                     "Failed to build CryTable for: {file}",
                     file);
 
-                return false);
+                return false;
             }
 
             table.Map = table.CryData!
