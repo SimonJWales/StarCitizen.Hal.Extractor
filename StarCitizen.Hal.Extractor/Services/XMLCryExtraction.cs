@@ -224,6 +224,113 @@ namespace Hal.Extractor.Services
             return true;
         }
 
+        static bool UnSocpakAsync(string socpakFile)
+        {
+            string directory = Path.GetDirectoryName(socpakFile)!;
+
+            string fileNameWithoutExt = $"{Path.GetFileNameWithoutExtension(socpakFile)}-socpak";
+
+            // combine them to get the full path without extension
+            string newSocpakOutputPath = Path.Combine(
+                directory,
+                fileNameWithoutExt);
+
+            ZipFile? zipFile = null;
+
+            try
+            {
+                FileStream fs = File.OpenRead(socpakFile);
+
+                zipFile = new ZipFile(fs);
+
+                foreach (ZipEntry zipEntry in zipFile)
+                {
+                    if (!zipEntry.IsFile)
+                    {
+                        continue;
+                    }
+
+                    string entryFileName = zipEntry.Name;
+
+                    // adjust directory separators to match the operating system
+                    entryFileName = entryFileName.Replace(
+                        '/',
+                        Path.DirectorySeparatorChar);
+
+                    byte[] buffer = new byte[4096];
+
+                    Stream zipStream = zipFile.GetInputStream(zipEntry);
+
+                    // create full directory path
+                    string fullZipToPath = Path.Combine(
+                        newSocpakOutputPath,
+                        entryFileName);
+
+                    string directoryName = Path.GetDirectoryName(fullZipToPath)!;
+
+                    if (directoryName.Length > 0)
+
+                        Directory.CreateDirectory(directoryName);
+
+                    using FileStream streamWriter = File.Create(fullZipToPath);
+
+                    ICSharpCode.SharpZipLib.Core.StreamUtils.Copy(
+                        zipStream,
+                        streamWriter,
+                        buffer);
+                }
+            }
+            finally
+            {
+                if (zipFile is not null)
+                {
+                    // close also closes the underlying stream
+                    zipFile.IsStreamOwner = true;
+
+                    // release resources
+                    zipFile.Close();
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Convert DCB files async to XML and save to disk
+        /// </summary>
+        /// <param name="outputFile"></param>
+        /// <returns></returns>
+        static Task<bool> ConvertDcbToXmlAsync(string outputFile)
+        {
+            var task = Task.Run(() =>
+            {
+                if (Parameters.CancelTokenSource.IsCancellationRequested)
+                {
+                    return false;
+                }
+
+                using var binaryReader = new BinaryReader(File.OpenRead(outputFile));
+
+                bool legacy = new FileInfo(outputFile).Length < 0x0e2e00;
+
+                DataForge dataForge = new(
+                    binaryReader,
+                    legacy);
+
+                string xmlPath = Path.ChangeExtension(
+                    outputFile,
+                    "xml");
+
+                dataForge.Save(xmlPath);
+
+                return true;
+            });
+
+            task.Wait();
+
+            return task;
+        }
+
         static CryTable BuildCryTable(BinaryReader binaryReader, Endiness endiness, CryMeta meta)
         {
             return new()
@@ -623,159 +730,6 @@ namespace Hal.Extractor.Services
                 binaryReader.ReadByte(),
                 binaryReader.ReadByte()
             ];
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        static bool UnSocpakAsync(string socpakFile)
-        {
-            string directory = Path.GetDirectoryName(socpakFile)!;
-
-            string fileNameWithoutExt = $"{Path.GetFileNameWithoutExtension(socpakFile)}-socpak";
-
-            // combine them to get the full path without extension
-            string newSocpakOutputPath = Path.Combine(
-                directory,
-                fileNameWithoutExt);
-
-            ZipFile? zipFile = null;
-
-            try
-            {
-                FileStream fs = File.OpenRead(socpakFile);
-
-                zipFile = new ZipFile(fs);
-
-                foreach (ZipEntry zipEntry in zipFile)
-                {
-                    if (!zipEntry.IsFile)
-                    {
-                        continue;
-                    }
-                    
-                    string entryFileName = zipEntry.Name;
-
-                    // adjust directory separators to match the operating system
-                    entryFileName = entryFileName.Replace(
-                        '/', 
-                        Path.DirectorySeparatorChar);
-
-                    byte[] buffer = new byte[4096];
-
-                    Stream zipStream = zipFile.GetInputStream(zipEntry);
-
-                    // create full directory path
-                    string fullZipToPath = Path.Combine(
-                        newSocpakOutputPath, 
-                        entryFileName);
-
-                    string directoryName = Path.GetDirectoryName(fullZipToPath)!;
-
-                    if (directoryName.Length > 0)
-
-                        Directory.CreateDirectory(directoryName);
-
-                    using FileStream streamWriter = File.Create(fullZipToPath);
-
-                    ICSharpCode.SharpZipLib.Core.StreamUtils.Copy(
-                        zipStream, 
-                        streamWriter, 
-                        buffer);
-                }
-            }
-            finally
-            {
-                if (zipFile is not null)
-                {
-                    // close also closes the underlying stream
-                    zipFile.IsStreamOwner = true;
-
-                    // release resources
-                    zipFile.Close();
-                }
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// Convert DCB files async to XML and save to disk
-        /// </summary>
-        /// <param name="outputFile"></param>
-        /// <returns></returns>
-        static Task<bool> ConvertDcbToXmlAsync(string outputFile)
-        {
-            var task = Task.Run(() =>
-            {
-                if (Parameters.CancelTokenSource.IsCancellationRequested)
-                {
-                    return false;
-                }
-
-                using var binaryReader = new BinaryReader(File.OpenRead(outputFile));
-
-                bool legacy = new FileInfo(outputFile).Length < 0x0e2e00;
-
-                DataForge dataForge = new(
-                    binaryReader,
-                    legacy);
-
-                string xmlPath = Path.ChangeExtension(
-                    outputFile,
-                    "xml");
-
-                dataForge.Save(xmlPath);
-
-                return true;
-            });
-
-            task.Wait();
-
-            return task;
         }
     }
 }

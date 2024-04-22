@@ -283,14 +283,6 @@ namespace StarCitizen.Hal.Extractor.Library.Dolkens.Unforge
                 if (dataMapping.StructIndex == 0xFFFF)
                 {
                     dataMapping.Node!.ParentNode.RemoveChild(dataMapping.Node);
-
-                    //#if NONULL
-                    //                    dataMapping.Node!.ParentNode.RemoveChild(dataMapping.Node);
-                    //#else
-                    //                    dataMapping.Item1.ParentNode.ReplaceChild(
-                    //                        this._xmlDocument.CreateElement("null"),
-                    //                        dataMapping.Item1);
-                    //#endif
                 }
                 else if (DataMap.ContainsKey(dataMapping.StructIndex) &&
                     DataMap[dataMapping.StructIndex].Count > dataMapping.RecordIndex)
@@ -358,7 +350,7 @@ namespace StarCitizen.Hal.Extractor.Library.Dolkens.Unforge
                 if (!Directory.Exists(Path.GetDirectoryName(newPath)))
                     Directory.CreateDirectory(Path.GetDirectoryName(newPath)!);
 
-                XmlDocument doc = new XmlDocument { };
+                XmlDocument doc = new() { };
 
                 doc.LoadXml(DataMap[record.StructIndex][record.VariantIndex].OuterXml);
 

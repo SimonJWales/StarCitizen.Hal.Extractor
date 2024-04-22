@@ -78,7 +78,7 @@ namespace StarCitizen.Hal.Extractor.ViewModels
             {
                 UpdateInfoText = "No files were extracted";
 
-                UpdateInfoTextColour = "#ff0000";
+                InfoTextColour("Error");
 
                 StopTheClock();
 
@@ -91,7 +91,7 @@ namespace StarCitizen.Hal.Extractor.ViewModels
 
             UpdateInfoText = "Extraction completed";
 
-            UpdateInfoTextColour = "#00ff00";
+            InfoTextColour("Success");
         }
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace StarCitizen.Hal.Extractor.ViewModels
             {
                 UpdateInfoText = "No p4k file selected";
 
-                UpdateInfoTextColour = "#ff0000";
+                InfoTextColour("Error");
 
                 return false;
             }
@@ -113,7 +113,7 @@ namespace StarCitizen.Hal.Extractor.ViewModels
             {
                 UpdateInfoText = "No output path selected";
 
-                UpdateInfoTextColour = "#ff0000";
+                InfoTextColour("Error");
 
                 return false;
             }
@@ -122,7 +122,7 @@ namespace StarCitizen.Hal.Extractor.ViewModels
             {
                 UpdateInfoText = "Select file types for extraction";
 
-                UpdateInfoTextColour = "#ff0000";
+                InfoTextColour("Error");
 
                 return false;
             }
@@ -135,6 +135,23 @@ namespace StarCitizen.Hal.Extractor.ViewModels
             }
 
             return true;
+        }
+
+        void InfoTextColour(string colourType)
+        {
+            var hasColour = Application.Current!.Resources
+                .TryGetValue(
+                    colourType,
+                    out var resourceValue);
+
+            if (hasColour && resourceValue is Color colourValue)
+            {
+                UpdateInfoTextColour = colourValue.ToHex();
+
+                return;
+            }
+            
+            UpdateInfoTextColour = "#3299ff";
         }
 
         [RelayCommand]
@@ -171,7 +188,7 @@ namespace StarCitizen.Hal.Extractor.ViewModels
             {
                 UpdateInfoText = "Unknown extension type";
 
-                UpdateInfoTextColour = "#ff0000";
+                InfoTextColour("Error");
 
                 return;
             }
@@ -243,7 +260,7 @@ namespace StarCitizen.Hal.Extractor.ViewModels
             {
                 UpdateInfoText = "Unknown extension type";
 
-                UpdateInfoTextColour = "#ff0000";
+                InfoTextColour("Error");
 
                 return;
             }
