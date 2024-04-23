@@ -1,4 +1,5 @@
 ﻿
+using CommunityToolkit.Mvvm.DependencyInjection;
 using ICSharpCode.SharpZipLib.Zip;
 using Microsoft.Extensions.Logging;
 using StarCitizen.Hal.Extractor.Library.Cry;
@@ -8,6 +9,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using System.Xml;
+using Windows.Devices.Geolocation;
 
 namespace Hal.Extractor.Services
 {
@@ -300,7 +302,7 @@ namespace Hal.Extractor.Services
         /// </summary>
         /// <param name="outputFile"></param>
         /// <returns></returns>
-        static Task<bool> ConvertDcbToXmlAsync(string outputFile)
+        Task<bool> ConvertDcbToXmlAsync(string outputFile)
         {
             var task = Task.Run(() =>
             {
@@ -315,13 +317,19 @@ namespace Hal.Extractor.Services
 
                 DataForge dataForge = new(
                     binaryReader,
-                    legacy);
+                legacy);
+
+                AppState.UpdateFileCount(AppState.FileCount + 1);
 
                 string xmlPath = Path.ChangeExtension(
                     outputFile,
                     "xml");
 
-                dataForge.Save(xmlPath);
+                dataForge.Save(
+                    xmlPath,
+                    AppState);
+
+                AppState.UpdateConvertedCount(AppState.ConvertedCount + 1);
 
                 return true;
             });

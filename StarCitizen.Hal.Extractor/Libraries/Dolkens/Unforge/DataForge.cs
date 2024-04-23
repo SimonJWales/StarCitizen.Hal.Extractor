@@ -1,4 +1,5 @@
 ﻿
+using Hal.Extractor.Services;
 using StarCitizen.Hal.Extractor.Library.Dolkens.Unforge.ComplexTypes;
 using StarCitizen.Hal.Extractor.Library.Dolkens.Unforge.SimpleTypes;
 using System.Collections;
@@ -326,7 +327,9 @@ namespace StarCitizen.Hal.Extractor.Library.Dolkens.Unforge
             return _xmlDocument.CreateAttribute(name); 
         }
 
-        public void Save(string filename)
+        public void Save(
+            string filename,
+            AppState appState)
         {
             if (string.IsNullOrWhiteSpace(_xmlDocument?.InnerXml))
             {
@@ -335,8 +338,15 @@ namespace StarCitizen.Hal.Extractor.Library.Dolkens.Unforge
 
             var i = 0;
 
+            var appCount = appState.FileCount;
+
             foreach (var record in RecordDefinitionTable)
             {
+                if (Parameters.CancelTokenSource.IsCancellationRequested)
+                {
+                    return;
+                }
+
                 var fileReference = record.FileName;
 
                 if (fileReference.Split('/').Length == 2)
@@ -352,12 +362,16 @@ namespace StarCitizen.Hal.Extractor.Library.Dolkens.Unforge
 
                 XmlDocument doc = new() { };
 
+                appState.UpdateFileCount(++appCount);
+
                 doc.LoadXml(DataMap[record.StructIndex][record.VariantIndex].OuterXml);
 
                 doc.Save(newPath);
             }
 
             _xmlDocument!.Save(filename);
+
+            appState.UpdateFileCount(++appCount);
         }
 
         internal void Compile()
