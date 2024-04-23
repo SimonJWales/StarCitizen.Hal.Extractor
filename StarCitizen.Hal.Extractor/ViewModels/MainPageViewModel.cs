@@ -53,6 +53,11 @@ namespace StarCitizen.Hal.Extractor.ViewModels
             ExtractFromPath = FileService.ReadPreference(Parameters.ExtractFromPreference);
 
             ExtractToPath = FileService.ReadPreference(Parameters.ExtractToPreference);
+
+            if (!string.IsNullOrWhiteSpace(ExtractToPath))
+            {
+                AppState.SetLogPath(ExtractToPath);
+            }
         }
 
         [RelayCommand]
@@ -316,6 +321,8 @@ namespace StarCitizen.Hal.Extractor.ViewModels
                 FileService.SavePreference(
                     Parameters.ExtractToPreference!,
                     ExtractToPath);
+
+                AppState!.SetLogPath(ExtractToPath);
             }
         }
 

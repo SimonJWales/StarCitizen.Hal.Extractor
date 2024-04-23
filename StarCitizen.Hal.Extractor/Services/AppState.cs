@@ -41,5 +41,18 @@ namespace Hal.Extractor.Services
         {
             LogErrorStateHasChanged?.Invoke();
         }
+
+        public Action? LogPathHasChanged;
+        public string? LogPath { get; set; }
+        public void SetLogPath(string value)
+        {
+            LogPath = value;
+
+            NotifyLogPathChanged();
+        }
+        void NotifyLogPathChanged()
+        {
+            LogPathHasChanged?.Invoke();
+        }
     }
 }

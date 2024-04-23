@@ -282,7 +282,7 @@
                    Grid.Row="2" />
 
             <Label Text="Possible errors. Check the log."
-                   ToolTipProperties.Text="Log is at: C:\Users\&lt;USERNAME>\AppData\Local\Packages\SCHAL.HALExtractor_&lt;ID>\LocalCache\Local\halx_&lt;DATE>.log"
+                   ToolTipProperties.Text="Log can be found in the output folder."
                    TextColor="{StaticResource Warning}"
                    IsVisible="{Binding LogErrors}"
                    HorizontalOptions="CenterAndExpand"

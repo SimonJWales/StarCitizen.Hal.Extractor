@@ -42,13 +42,9 @@ namespace StarCitizen.Hal.Extractor
 
             builder.Services.AddSingleton<ILogger>(serviceProvider =>
             {
-                string logPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-
                 AppState appState = serviceProvider.GetRequiredService<AppState>();
 
-                return new Log(
-                    logPath, 
-                    appState);
+                return new Log(appState);
             });
 
             return builder.Build();
