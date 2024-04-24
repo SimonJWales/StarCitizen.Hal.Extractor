@@ -2,6 +2,8 @@
 using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Mvvm.Input;
 using Hal.Extractor.Services;
+using Microsoft.Extensions.Logging;
+using StarCitizen.Hal.Extractor.Services;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Reflection;
@@ -18,6 +20,8 @@ namespace StarCitizen.Hal.Extractor.ViewModels
 
         AppState AppState { get; set; }
 
+        ILogger Log { get; set; }
+
         public ObservableCollection<string>? ObservedFileTypes { get; } = [];
 
         public ObservableCollection<string>? ObservedExtensions { get; } = [];
@@ -31,13 +35,16 @@ namespace StarCitizen.Hal.Extractor.ViewModels
         public MainPageViewModel(
             ExtractionService extractionService,
             XMLCryExtraction xMLCryExtraction,
-            AppState appState)
+            AppState appState,
+            ILogger log)
         {
             ExtractionService = extractionService;
 
             XMLCryExtraction = xMLCryExtraction;
 
             AppState = appState;
+
+            Log = log;
 
             Title = Parameters.Title;
 
@@ -437,6 +444,11 @@ namespace StarCitizen.Hal.Extractor.ViewModels
                     if (!ObservedExtensions!.Contains(item))
                     {
                         // new item extension found
+                        
+                        Log.LogError(
+                            "New extension found: {item}", 
+                            item);
+
                         AreNewExtensionsFound = true;
                     }
 
