@@ -11,6 +11,10 @@
                     Dark={StaticResource BackgroundDark}}">
 
     <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Buy me a beer"                      
+                   ToolTipProperties.Text="If you like the app and want to show your appreciation :)"
+                     Command="{Binding LaunchBrowserCommand}"
+                     IsEnabled="true"/>
         <ToolbarItem Text="Data.p4k"                      
                    ToolTipProperties.Text="Set the path to the data.p4k file."
                      Command="{Binding ExtractionPathSelectionClickedCommand}"

@@ -32,6 +32,8 @@ namespace StarCitizen.Hal.Extractor.ViewModels
 
         public string AppVersion { get; set; }
 
+        readonly string _buyMeACoffee = "https://www.buymeacoffee.com/schal";
+
         public MainPageViewModel(
             ExtractionService extractionService,
             XMLCryExtraction xMLCryExtraction,
@@ -106,66 +108,6 @@ namespace StarCitizen.Hal.Extractor.ViewModels
             InfoTextColour("Success");
         }
 
-        /// <summary>
-        /// Check that we have all the variables we need to begin extracting
-        /// </summary>
-        /// <returns></returns>
-        bool OkToBeginExtracting()
-        {
-            if (string.IsNullOrWhiteSpace(ExtractFromPath))
-            {
-                UpdateInfoText = "No p4k file selected";
-
-                InfoTextColour("Error");
-
-                return false;
-            }
-
-            if (string.IsNullOrWhiteSpace(ExtractToPath))
-            {
-                UpdateInfoText = "No output path selected";
-
-                InfoTextColour("Error");
-
-                return false;
-            }
-
-            if (ObservedFileTypes?.Count == 0)
-            {
-                UpdateInfoText = "Select file types for extraction";
-
-                InfoTextColour("Error");
-
-                return false;
-            }
-
-            if (AreWeExtracting)
-            {
-                AreWeExtracting = false;
-
-                return false;
-            }
-
-            return true;
-        }
-
-        void InfoTextColour(string colourType)
-        {
-            var hasColour = Application.Current!.Resources
-                .TryGetValue(
-                    colourType,
-                    out var resourceValue);
-
-            if (hasColour && resourceValue is Color colourValue)
-            {
-                UpdateInfoTextColour = colourValue.ToHex();
-
-                return;
-            }
-            
-            UpdateInfoTextColour = "#3299ff";
-        }
-
         [RelayCommand]
         void CancelExtraction()
         {
@@ -208,7 +150,7 @@ namespace StarCitizen.Hal.Extractor.ViewModels
             ResetUpdateInfoText();
 
             if (Parameters.Defaults.TryGetValue(
-                extension, 
+                extension,
                 out List<string>? values))
             {
                 // are we trying to add all extensions?
@@ -331,6 +273,76 @@ namespace StarCitizen.Hal.Extractor.ViewModels
 
                 AppState!.SetLogPath(ExtractToPath);
             }
+        }
+
+        [RelayCommand]
+        async Task LaunchBrowser()
+        {
+            Uri uri = new(_buyMeACoffee);
+
+            if (await Launcher.CanOpenAsync(uri))
+            {
+                await Launcher.OpenAsync(uri);
+            }
+        }
+        /// <summary>
+        /// Check that we have all the variables we need to begin extracting
+        /// </summary>
+        /// <returns></returns>
+        bool OkToBeginExtracting()
+        {
+            if (string.IsNullOrWhiteSpace(ExtractFromPath))
+            {
+                UpdateInfoText = "No p4k file selected";
+
+                InfoTextColour("Error");
+
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(ExtractToPath))
+            {
+                UpdateInfoText = "No output path selected";
+
+                InfoTextColour("Error");
+
+                return false;
+            }
+
+            if (ObservedFileTypes?.Count == 0)
+            {
+                UpdateInfoText = "Select file types for extraction";
+
+                InfoTextColour("Error");
+
+                return false;
+            }
+
+            if (AreWeExtracting)
+            {
+                AreWeExtracting = false;
+
+                return false;
+            }
+
+            return true;
+        }
+
+        void InfoTextColour(string colourType)
+        {
+            var hasColour = Application.Current!.Resources
+                .TryGetValue(
+                    colourType,
+                    out var resourceValue);
+
+            if (hasColour && resourceValue is Color colourValue)
+            {
+                UpdateInfoTextColour = colourValue.ToHex();
+
+                return;
+            }
+            
+            UpdateInfoTextColour = "#3299ff";
         }
 
         async Task<List<string>?> Extract()
