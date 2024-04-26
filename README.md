@@ -1,4 +1,4 @@
-![HAL X](https://badgen.net/badge/SC-HAL/Extractor/purple?icon=windows) ![Windows](https://badgen.net/badge/icon/windows?icon=windows&label) ![HAL X](https://badgen.net/github/release/SimonJWales/StarCitizen.Hal.Extractor) ![HAL X](https://badgen.net/github/license/SimonJWales/StarCitizen.Hal.Extractor) ![HAL X](https://badgen.net/github/last-commit/SimonJWales/StarCitizen.Hal.Extractor) [![Buy Me a Coffee](https://badgen.net/badge/Support/Buymeacoffee/yellow?icon=buymeacoffee)](https://buymeacoffee.com/schal)
+![HAL X](https://badgen.net/badge/SC-HAL/Extractor/purple?icon=windows) ![Windows](https://badgen.net/badge/icon/windows?icon=windows&label) ![HAL X](https://badgen.net/github/release/SimonJWales/StarCitizen.Hal.Extractor) ![HAL X][(https://badgen.net/github/license/BSD/blue)](https://github.com/SimonJWales/StarCitizen.Hal.Extractor/blob/main/LICENSE.md) ![HAL X](https://badgen.net/github/last-commit/SimonJWales/StarCitizen.Hal.Extractor) [![Buy Me a Coffee](https://badgen.net/badge/Support/Buymeacoffee/yellow?icon=buymeacoffee)](https://buymeacoffee.com/schal)
 
 # Star Citizen Hal Extractor
 
