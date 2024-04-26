@@ -1,21 +1,24 @@
 ﻿
 using Hal.Extractor.Entities;
 using Microsoft.Win32;
+using System.Runtime.Versioning;
 using System.Text.Json;
 
 namespace Hal.Extractor.Services;
 
 public class FileService
 {
+    [SupportedOSPlatform("windows")]
     public static void SavePreference(
         string valuePath,
         string valueData)
     {
-        Preferences.Set(
-            valuePath, 
-            valueData);
+            Preferences.Set(
+                valuePath,
+                valueData);
     }
 
+    [SupportedOSPlatform("windows")]
     public static string? ReadPreference(string valuePath)
     {
         return Preferences.Get(
@@ -27,7 +30,7 @@ public class FileService
     /// <summary>
     /// Get the branch and build data from the build manifest file
     /// </summary>
-    /// <param name="log"></param>
+    /// <param name="p4kFile"></param>
     /// <returns></returns>
     public static async Task<VersionData> GetGameVersionData(string p4kFile)
     {

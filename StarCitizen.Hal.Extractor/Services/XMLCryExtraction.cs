@@ -1,14 +1,15 @@
 ﻿
+using CommunityToolkit.Mvvm.DependencyInjection;
 using ICSharpCode.SharpZipLib.Zip;
 using Microsoft.Extensions.Logging;
 using StarCitizen.Hal.Extractor.Library.Cry;
+using StarCitizen.Hal.Extractor.Library.Dolkens.Unforge;
 using StarCitizen.Hal.Extractor.Library.Enum;
-using StarCitizen.Hal.Extractor.Services;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using System.Xml;
-using unforge;
+using Windows.Devices.Geolocation;
 
 namespace Hal.Extractor.Services
 {
@@ -76,7 +77,7 @@ namespace Hal.Extractor.Services
                     }
                     catch (OperationCanceledException)
                     {
-                        Log.LogInformation("CryXML extraction was canceled while parallel");
+                        //Log.LogInformation("CryXML extraction was canceled while parallel");
 
                         return;
                     }
@@ -112,8 +113,6 @@ namespace Hal.Extractor.Services
 
                 if (extension is ".dcb")
                 {
-                    //return await ConvertDcbToXmlAsync(outputFile);
-
                     return await ConvertDcbToXmlAsync(file);
                 }
 
@@ -126,17 +125,13 @@ namespace Hal.Extractor.Services
                     extension is ".entxml" ||
                     extension is ".bspace")
                 {
-                    (bool savedOk, bool error) = HalXml(file);
+                    bool savedOk = HalXml(file);
 
                     return savedOk;
                 }
             }
             catch (OperationCanceledException)
             {
-                Log.LogInformation(
-                    "HalConverter was canceled while processing {file}", 
-                    file);
-
                 return false;
             }
             catch (Exception ex)
@@ -153,7 +148,7 @@ namespace Hal.Extractor.Services
             return true;
         }
 
-        (bool, bool) HalXml(string file)
+        bool HalXml(string file)
         {
             using FileStream fs = new(
                 file,
@@ -168,7 +163,7 @@ namespace Hal.Extractor.Services
             if (isXML)
             {
                 // already an xml file (or not anything we want to decrpyt)
-                return (false, false);
+                return false;
             }
 
             if (peek != 'C')
@@ -178,7 +173,7 @@ namespace Hal.Extractor.Services
                     peek,
                     file);
 
-                return (false, true);
+                return false;
             }
 
             // read a Fixed-Length string from the stream
@@ -192,7 +187,7 @@ namespace Hal.Extractor.Services
 
             if (!isCryFile)
             {
-                return (false, false);
+                return false;
             }
 
             long headerLength = binaryReader.BaseStream.Position;
@@ -204,6 +199,7 @@ namespace Hal.Extractor.Services
             CryMeta meta = GetCryMeta(
                 binaryReader,
                 endiness);
+
             CryTable? table = BuildCryTable(
                 binaryReader, 
                 endiness, 
@@ -215,7 +211,7 @@ namespace Hal.Extractor.Services
                     "Failed to build CryTable for: {file}",
                     file);
 
-                return (false, true);
+                return false;
             }
 
             table.Map = table.CryData!
@@ -227,7 +223,120 @@ namespace Hal.Extractor.Services
 
             xml?.Save(file);
 
-            return (true, false);
+            return true;
+        }
+
+        static bool UnSocpakAsync(string socpakFile)
+        {
+            string directory = Path.GetDirectoryName(socpakFile)!;
+
+            string fileNameWithoutExt = $"{Path.GetFileNameWithoutExtension(socpakFile)}-socpak";
+
+            // combine them to get the full path without extension
+            string newSocpakOutputPath = Path.Combine(
+                directory,
+                fileNameWithoutExt);
+
+            ZipFile? zipFile = null;
+
+            try
+            {
+                FileStream fs = File.OpenRead(socpakFile);
+
+                zipFile = new ZipFile(fs);
+
+                foreach (ZipEntry zipEntry in zipFile)
+                {
+                    if (!zipEntry.IsFile)
+                    {
+                        continue;
+                    }
+
+                    string entryFileName = zipEntry.Name;
+
+                    // adjust directory separators to match the operating system
+                    entryFileName = entryFileName.Replace(
+                        '/',
+                        Path.DirectorySeparatorChar);
+
+                    byte[] buffer = new byte[4096];
+
+                    Stream zipStream = zipFile.GetInputStream(zipEntry);
+
+                    // create full directory path
+                    string fullZipToPath = Path.Combine(
+                        newSocpakOutputPath,
+                        entryFileName);
+
+                    string directoryName = Path.GetDirectoryName(fullZipToPath)!;
+
+                    if (directoryName.Length > 0)
+
+                        Directory.CreateDirectory(directoryName);
+
+                    using FileStream streamWriter = File.Create(fullZipToPath);
+
+                    ICSharpCode.SharpZipLib.Core.StreamUtils.Copy(
+                        zipStream,
+                        streamWriter,
+                        buffer);
+                }
+            }
+            finally
+            {
+                if (zipFile is not null)
+                {
+                    // close also closes the underlying stream
+                    zipFile.IsStreamOwner = true;
+
+                    // release resources
+                    zipFile.Close();
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Convert DCB files async to XML and save to disk
+        /// </summary>
+        /// <param name="outputFile"></param>
+        /// <returns></returns>
+        Task<bool> ConvertDcbToXmlAsync(string outputFile)
+        {
+            var task = Task.Run(() =>
+            {
+                if (Parameters.CancelTokenSource.IsCancellationRequested)
+                {
+                    return false;
+                }
+
+                using var binaryReader = new BinaryReader(File.OpenRead(outputFile));
+
+                bool legacy = new FileInfo(outputFile).Length < 0x0e2e00;
+
+                DataForge dataForge = new(
+                    binaryReader,
+                legacy);
+
+                AppState.UpdateFileCount(AppState.FileCount + 1);
+
+                string xmlPath = Path.ChangeExtension(
+                    outputFile,
+                    "xml");
+
+                dataForge.Save(
+                    xmlPath,
+                    AppState);
+
+                AppState.UpdateConvertedCount(AppState.ConvertedCount + 1);
+
+                return true;
+            });
+
+            task.Wait();
+
+            return task;
         }
 
         static CryTable BuildCryTable(BinaryReader binaryReader, Endiness endiness, CryMeta meta)
@@ -299,7 +408,6 @@ namespace Hal.Extractor.Services
                     break;
 
                 default:
-
                     Log.LogError(
                         "Unknown File Format: {header})",
                         header);
@@ -380,7 +488,7 @@ namespace Hal.Extractor.Services
             return endiness;
         }
 
-        static XmlDocument BuildXmlDocument(CryTable table)
+        XmlDocument BuildXmlDocument(CryTable table)
         {
             var xmlDoc = new XmlDocument();
 
@@ -390,11 +498,15 @@ namespace Hal.Extractor.Services
 
             if (table.CryNode?.Count == 0)
             {
+                Log.LogCritical("No nodes found in CryTable.");
+
                 throw new FormatException("No nodes found in CryTable.");
             }
 
             if (table.CryReference?.Count == 0)
             {
+                Log.LogCritical("No references found in CryTable.");
+
                 throw new FormatException("No references found in CryTable.");
             }
 
@@ -404,6 +516,8 @@ namespace Hal.Extractor.Services
 
                 if (string.IsNullOrWhiteSpace(nodeName))
                 {
+                    Log.LogCritical("Node name is empty or null");
+
                     throw new FormatException("Node name is empty or null.");
                 }
 
@@ -425,7 +539,7 @@ namespace Hal.Extractor.Services
                     {
                         element.SetAttribute(
                             table.Map?[attributeRef.NameOffset] ?? "",
-                            "BUGGED");
+                            "UNKNOWN");
                     }
                 }
 
@@ -438,7 +552,7 @@ namespace Hal.Extractor.Services
                 }
                 else
                 {
-                    element.AppendChild(xmlDoc.CreateCDataSection("BUGGED"));
+                    element.AppendChild(xmlDoc.CreateCDataSection("UNKNOWN"));
                 }
 
                 xmlMap[node.NodeID] = element;
@@ -624,371 +738,6 @@ namespace Hal.Extractor.Services
                 binaryReader.ReadByte(),
                 binaryReader.ReadByte()
             ];
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        /// <summary>
-        /// Convert files that are CryXML types and DCB files to a readable file format
-        /// </summary>
-        /// <param name="outputFile"></param>
-        /// <returns></returns>
-        static bool Smelt(
-            string outputFile)
-        {
-            try
-            {
-                if (Parameters.CancelTokenSource.IsCancellationRequested)
-                {
-                    return false;
-                }
-
-                string extension = Path.GetExtension(outputFile).ToLowerInvariant();
-
-                if (extension is ".dcb")
-                {
-                    //return await ConvertDcbToXmlAsync(outputFile);
-
-                    return ConvertDcbToXml(outputFile);
-                }
-
-                if (extension is ".socpak")
-                {
-                    return UnSocpakAsync(outputFile);
-                }
-
-                if (extension is ".xml" ||
-                    extension is ".entxml" ||
-                    extension is ".bspace")
-                {
-                    //return await ProcessXmlFileAsync(outputFile);
-
-                    return ProcessXmlFile(outputFile);
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                Debug.WriteLine($"Smelt extraction was canceled while processing {outputFile}");
-
-                return false;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Smelt extraction file error {outputFile}: {ex}");
-
-                return false;
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// Convert files that are CryXML types and DCB files to a readable file format
-        /// </summary>
-        /// <param name="outputFile"></param>
-        /// <returns></returns>
-        static async Task<bool> SmeltAsync(
-            string outputFile)
-        {
-            try
-            {
-                if (Parameters.CancelTokenSource.IsCancellationRequested)
-                {
-                    return false;
-                }
-
-                string extension = Path.GetExtension(outputFile).ToLowerInvariant();
-
-                if (extension is ".dcb")
-                {
-                    //return await ConvertDcbToXmlAsync(outputFile);
-
-                    return await ConvertDcbToXmlAsync(outputFile);
-                }
-
-                if (extension is ".socpak")
-                {
-                    return UnSocpakAsync(outputFile);
-                }
-
-                if (extension is ".xml" ||
-                    extension is ".entxml" ||
-                    extension is ".bspace")
-                {
-                    //return await ProcessXmlFileAsync(outputFile);
-
-                    return await ProcessXmlFileAsync(outputFile);
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                Debug.WriteLine($"SmeltAsync extraction was canceled while processing {outputFile}");
-
-                return false;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"SmeltAsync extraction file error {outputFile}: {ex}");
-
-                return false;
-            }
-
-            return true;
-        }
-
-        static bool UnSocpakAsync(string socpakFile)
-        {
-            string directory = Path.GetDirectoryName(socpakFile)!;
-
-            string fileNameWithoutExt = $"{Path.GetFileNameWithoutExtension(socpakFile)}-socpak";
-
-            // combine them to get the full path without extension
-            string newSocpakOutputPath = Path.Combine(
-                directory,
-                fileNameWithoutExt);
-
-            ZipFile? zipFile = null;
-
-            try
-            {
-                FileStream fs = File.OpenRead(socpakFile);
-
-                zipFile = new ZipFile(fs);
-
-                foreach (ZipEntry zipEntry in zipFile)
-                {
-                    if (!zipEntry.IsFile)
-                    {
-                        continue;
-                    }
-                    
-                    string entryFileName = zipEntry.Name;
-
-                    // adjust directory separators to match the operating system
-                    entryFileName = entryFileName.Replace(
-                        '/', 
-                        Path.DirectorySeparatorChar);
-
-                    byte[] buffer = new byte[4096];
-
-                    Stream zipStream = zipFile.GetInputStream(zipEntry);
-
-                    // create full directory path
-                    string fullZipToPath = Path.Combine(
-                        newSocpakOutputPath, 
-                        entryFileName);
-
-                    string directoryName = Path.GetDirectoryName(fullZipToPath)!;
-
-                    if (directoryName.Length > 0)
-
-                        Directory.CreateDirectory(directoryName);
-
-                    using FileStream streamWriter = File.Create(fullZipToPath);
-
-                    ICSharpCode.SharpZipLib.Core.StreamUtils.Copy(
-                        zipStream, 
-                        streamWriter, 
-                        buffer);
-                }
-            }
-            finally
-            {
-                if (zipFile is not null)
-                {
-                    // close also closes the underlying stream
-                    zipFile.IsStreamOwner = true;
-
-                    // release resources
-                    zipFile.Close();
-                }
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// Convert DCB files to XML and save to disk
-        /// </summary>
-        /// <param name="outputFile"></param>
-        /// <returns></returns>
-        static bool ConvertDcbToXml(string outputFile)
-        {
-            if (Parameters.CancelTokenSource.IsCancellationRequested)
-            {
-                return false;
-            }
-
-            using var binaryReader = new BinaryReader(File.OpenRead(outputFile));
-
-            bool legacy = new FileInfo(outputFile).Length < 0x0e2e00;
-
-            DataForge dataForge = new(
-                binaryReader,
-                legacy);
-
-            string xmlPath = Path.ChangeExtension(
-                outputFile,
-                "xml");
-
-            dataForge.Save(xmlPath);
-
-            return true;
-        }
-
-        /// <summary>
-        /// Convert DCB files async to XML and save to disk
-        /// </summary>
-        /// <param name="outputFile"></param>
-        /// <returns></returns>
-        static Task<bool> ConvertDcbToXmlAsync(string outputFile)
-        {
-            var task = Task.Run(() =>
-            {
-                if (Parameters.CancelTokenSource.IsCancellationRequested)
-                {
-                    return false;
-                }
-
-                using var binaryReader = new BinaryReader(File.OpenRead(outputFile));
-
-                bool legacy = new FileInfo(outputFile).Length < 0x0e2e00;
-
-                DataForge dataForge = new(
-                    binaryReader,
-                    legacy);
-
-                string xmlPath = Path.ChangeExtension(
-                    outputFile,
-                    "xml");
-
-                dataForge.Save(xmlPath);
-
-                return true;
-            });
-
-            task.Wait();
-
-            return task;
-        }
-
-        /// <summary>
-        /// Process XML files and save to disk
-        /// </summary>
-        /// <param name="outputFile"></param>
-        /// <returns></returns>
-        static bool ProcessXmlFile(string outputFile)
-        {
-            if (Parameters.CancelTokenSource.IsCancellationRequested)
-            {
-                return false;
-            }
-
-            XmlDocument xml = CryXmlSerializer.ReadFile(outputFile);
-
-
-            string xmlPath = outputFile;
-
-            if (!Path.GetExtension(xmlPath).Equals(
-                ".xml",
-                StringComparison.CurrentCultureIgnoreCase))
-            {
-                xmlPath += ".xml";
-            }
-
-            //Path.ChangeExtension(
-            //    outputFile,
-            //    "xml");
-
-            xml?.Save(xmlPath);
-
-            return xml != null;
-        }
-
-        /// <summary>
-        /// Process XML files async and save to disk
-        /// </summary>
-        /// <param name="outputFile"></param>
-        /// <returns></returns>
-        static Task<bool> ProcessXmlFileAsync(string outputFile)
-        {
-            var task = Task.Run(() =>
-            {
-                if (Parameters.CancelTokenSource.IsCancellationRequested)
-                {
-                    return false;
-                }
-
-                XmlDocument xml = CryXmlSerializer.ReadFile(outputFile);
-
-
-                string xmlPath = outputFile;
-
-                if (!Path.GetExtension(xmlPath).Equals(
-                    ".xml", 
-                    StringComparison.CurrentCultureIgnoreCase))
-                {
-                    xmlPath += ".xml";
-                }
-
-                //Path.ChangeExtension(
-                //    outputFile,
-                //    "xml");
-
-                xml?.Save(xmlPath);
-
-                return xml != null;
-            });
-
-            task.Wait();
-
-            return task;
         }
     }
 }

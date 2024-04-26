@@ -2,17 +2,25 @@
 using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Mvvm.Input;
 using Hal.Extractor.Services;
+using Microsoft.Extensions.Logging;
+using StarCitizen.Hal.Extractor.Services;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Reflection;
+using System.Runtime.Versioning;
 
 namespace StarCitizen.Hal.Extractor.ViewModels
 {
+    [SupportedOSPlatform("windows")]
     public partial class MainPageViewModel : BaseViewModel
     {
         ExtractionService? ExtractionService { get; }
 
         XMLCryExtraction XMLCryExtraction { get; }
+
+        AppState AppState { get; set; }
+
+        ILogger Log { get; set; }
 
         public ObservableCollection<string>? ObservedFileTypes { get; } = [];
 
@@ -24,17 +32,25 @@ namespace StarCitizen.Hal.Extractor.ViewModels
 
         public string AppVersion { get; set; }
 
+        readonly string _buyMeACoffee = "https://www.buymeacoffee.com/schal";
+
         public MainPageViewModel(
             ExtractionService extractionService,
-            XMLCryExtraction xMLCryExtraction)
+            XMLCryExtraction xMLCryExtraction,
+            AppState appState,
+            ILogger log)
         {
             ExtractionService = extractionService;
 
             XMLCryExtraction = xMLCryExtraction;
 
+            AppState = appState;
+
+            Log = log;
+
             Title = Parameters.Title;
 
-            GetVersion();
+            AppVersion = GetVersion();
 
             ResetUpdateInfoText();
 
@@ -46,11 +62,21 @@ namespace StarCitizen.Hal.Extractor.ViewModels
             ExtractFromPath = FileService.ReadPreference(Parameters.ExtractFromPreference);
 
             ExtractToPath = FileService.ReadPreference(Parameters.ExtractToPreference);
+
+            if (!string.IsNullOrWhiteSpace(ExtractToPath))
+            {
+                AppState.SetLogPath(ExtractToPath);
+            }
         }
 
         [RelayCommand]
         async Task BeginExtractingAsync()
         {
+            if (AppState.LogErrorState)
+            {
+                AppState!.SetErrorState(false);
+            }
+
             bool okToProceed = OkToBeginExtracting();
 
             if (!okToProceed)
@@ -66,7 +92,7 @@ namespace StarCitizen.Hal.Extractor.ViewModels
             {
                 UpdateInfoText = "No files were extracted";
 
-                UpdateInfoTextColour = "#ff0000";
+                InfoTextColour("Error");
 
                 StopTheClock();
 
@@ -79,50 +105,7 @@ namespace StarCitizen.Hal.Extractor.ViewModels
 
             UpdateInfoText = "Extraction completed";
 
-            UpdateInfoTextColour = "#00ff00";
-        }
-
-        /// <summary>
-        /// Check that we have all the variables we need to begin extracting
-        /// </summary>
-        /// <returns></returns>
-        bool OkToBeginExtracting()
-        {
-            if (string.IsNullOrWhiteSpace(ExtractFromPath))
-            {
-                UpdateInfoText = "No p4k file selected";
-
-                UpdateInfoTextColour = "#ff0000";
-
-                return false;
-            }
-
-            if (string.IsNullOrWhiteSpace(ExtractToPath))
-            {
-                UpdateInfoText = "No output path selected";
-
-                UpdateInfoTextColour = "#ff0000";
-
-                return false;
-            }
-
-            if (ObservedFileTypes?.Count == 0)
-            {
-                UpdateInfoText = "Select file types for extraction";
-
-                UpdateInfoTextColour = "#ff0000";
-
-                return false;
-            }
-
-            if (AreWeExtracting)
-            {
-                AreWeExtracting = false;
-
-                return false;
-            }
-
-            return true;
+            InfoTextColour("Success");
         }
 
         [RelayCommand]
@@ -159,7 +142,7 @@ namespace StarCitizen.Hal.Extractor.ViewModels
             {
                 UpdateInfoText = "Unknown extension type";
 
-                UpdateInfoTextColour = "#ff0000";
+                InfoTextColour("Error");
 
                 return;
             }
@@ -167,7 +150,7 @@ namespace StarCitizen.Hal.Extractor.ViewModels
             ResetUpdateInfoText();
 
             if (Parameters.Defaults.TryGetValue(
-                extension, 
+                extension,
                 out List<string>? values))
             {
                 // are we trying to add all extensions?
@@ -231,7 +214,7 @@ namespace StarCitizen.Hal.Extractor.ViewModels
             {
                 UpdateInfoText = "Unknown extension type";
 
-                UpdateInfoTextColour = "#ff0000";
+                InfoTextColour("Error");
 
                 return;
             }
@@ -241,6 +224,7 @@ namespace StarCitizen.Hal.Extractor.ViewModels
             ObservedFileTypes.Remove(extension);
         }
 
+        [SupportedOSPlatform("windows")]
         [RelayCommand]
         async Task OnExtractionPathSelectionClickedAsync()
         {
@@ -272,12 +256,11 @@ namespace StarCitizen.Hal.Extractor.ViewModels
                 ExtractFromPath);
         }
 
+        [SupportedOSPlatform("windows")]
         [RelayCommand]
-        private async Task OnOutputToPathSelectionClickedAsync()
+        async Task OnOutputToPathSelectionClickedAsync()
         {
-#pragma warning disable CA1416 // Validate platform compatibility
             var result = await FolderPicker.Default.PickAsync();
-#pragma warning restore CA1416 // Validate platform compatibility
 
             if (result.IsSuccessful &&
                 !string.IsNullOrWhiteSpace(result.Folder?.Path))
@@ -287,7 +270,79 @@ namespace StarCitizen.Hal.Extractor.ViewModels
                 FileService.SavePreference(
                     Parameters.ExtractToPreference!,
                     ExtractToPath);
+
+                AppState!.SetLogPath(ExtractToPath);
             }
+        }
+
+        [RelayCommand]
+        async Task LaunchBrowser()
+        {
+            Uri uri = new(_buyMeACoffee);
+
+            if (await Launcher.CanOpenAsync(uri))
+            {
+                await Launcher.OpenAsync(uri);
+            }
+        }
+        /// <summary>
+        /// Check that we have all the variables we need to begin extracting
+        /// </summary>
+        /// <returns></returns>
+        bool OkToBeginExtracting()
+        {
+            if (string.IsNullOrWhiteSpace(ExtractFromPath))
+            {
+                UpdateInfoText = "No p4k file selected";
+
+                InfoTextColour("Error");
+
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(ExtractToPath))
+            {
+                UpdateInfoText = "No output path selected";
+
+                InfoTextColour("Error");
+
+                return false;
+            }
+
+            if (ObservedFileTypes?.Count == 0)
+            {
+                UpdateInfoText = "Select file types for extraction";
+
+                InfoTextColour("Error");
+
+                return false;
+            }
+
+            if (AreWeExtracting)
+            {
+                AreWeExtracting = false;
+
+                return false;
+            }
+
+            return true;
+        }
+
+        void InfoTextColour(string colourType)
+        {
+            var hasColour = Application.Current!.Resources
+                .TryGetValue(
+                    colourType,
+                    out var resourceValue);
+
+            if (hasColour && resourceValue is Color colourValue)
+            {
+                UpdateInfoTextColour = colourValue.ToHex();
+
+                return;
+            }
+            
+            UpdateInfoTextColour = "#3299ff";
         }
 
         async Task<List<string>?> Extract()
@@ -401,6 +456,11 @@ namespace StarCitizen.Hal.Extractor.ViewModels
                     if (!ObservedExtensions!.Contains(item))
                     {
                         // new item extension found
+                        
+                        Log.LogError(
+                            "New extension found: {item}", 
+                            item);
+
                         AreNewExtensionsFound = true;
                     }
 
@@ -426,7 +486,7 @@ namespace StarCitizen.Hal.Extractor.ViewModels
         /// Get the version number from the assembly
         /// </summary>
         /// <returns></returns>
-        void GetVersion()
+        string GetVersion()
         {
             var version = Assembly.GetExecutingAssembly().GetName().Version;
 
@@ -436,7 +496,7 @@ namespace StarCitizen.Hal.Extractor.ViewModels
                 AppVersion = "v0.0.1a";
             }
 
-            AppVersion = $"v{version!.Major}.{version!.Minor}.{version!.Build}";
+            return $"v{version!.Major}.{version!.Minor}.{version!.Build}";
         }
     }
 }

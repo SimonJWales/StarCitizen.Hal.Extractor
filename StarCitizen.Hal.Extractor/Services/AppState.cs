@@ -28,5 +28,31 @@ namespace Hal.Extractor.Services
         {
             ConvertedCountHasChanged?.Invoke();
         }
+
+        public Action? LogErrorStateHasChanged;
+        public bool LogErrorState { get; set; } = false;
+        public void SetErrorState(bool value)
+        {
+            LogErrorState = value;
+
+            NotifyLogErrorStateChanged();
+        }
+        void NotifyLogErrorStateChanged()
+        {
+            LogErrorStateHasChanged?.Invoke();
+        }
+
+        public Action? LogPathHasChanged;
+        public string? LogPath { get; set; }
+        public void SetLogPath(string value)
+        {
+            LogPath = value;
+
+            NotifyLogPathChanged();
+        }
+        void NotifyLogPathChanged()
+        {
+            LogPathHasChanged?.Invoke();
+        }
     }
 }

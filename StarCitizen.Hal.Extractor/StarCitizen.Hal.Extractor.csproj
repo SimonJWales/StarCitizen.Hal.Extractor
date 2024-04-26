@@ -40,7 +40,7 @@
 		<AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
 		<AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
 		<AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
-		<AppxSymbolPackageEnabled>True</AppxSymbolPackageEnabled>
+		<AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
 		<GenerateTestArtifacts>False</GenerateTestArtifacts>
 		<HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
 		<DefaultLanguage>en-gb</DefaultLanguage>
@@ -80,12 +80,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Libraries\SharpLib\" />
 	  <Folder Include="Resources\Splash\" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <ProjectReference Include="..\StarCitizen.Hal.Extractor.Library\StarCitizen.Hal.Extractor.Library.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

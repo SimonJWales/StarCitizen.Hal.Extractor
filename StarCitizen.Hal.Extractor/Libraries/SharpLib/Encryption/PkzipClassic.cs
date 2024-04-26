@@ -418,7 +418,7 @@ namespace ICSharpCode.SharpZipLib.Encryption
 		/// <returns>Returns a new PkzipClassic encryptor</returns>
 		public override ICryptoTransform CreateEncryptor(
 			byte[] rgbKey,
-			byte[] rgbIV)
+			byte[]? rgbIV)
 		{
 			key_ = rgbKey;
 			return new PkzipClassicEncryptCryptoTransform(Key);

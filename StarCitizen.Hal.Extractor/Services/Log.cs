@@ -1,11 +1,12 @@
 ﻿
+using Hal.Extractor.Services;
 using Microsoft.Extensions.Logging;
 
 namespace StarCitizen.Hal.Extractor.Services
 {
-    public class Log(string path) : ILogger
+    public class Log(AppState? appstate) : ILogger
     {
-        string _path = path;
+        AppState? _appState = appstate;
 
         readonly object _lock = new();
 
@@ -21,8 +22,7 @@ namespace StarCitizen.Hal.Extractor.Services
             EventId eventId, 
             TState state, 
             Exception? exception, 
-            Func<TState, Exception?, 
-                string> formatter)
+            Func<TState, Exception?, string> formatter)
         {
             if (!IsEnabled(logLevel))
             {
@@ -33,9 +33,19 @@ namespace StarCitizen.Hal.Extractor.Services
 
             lock (_lock)
             {
+                var logPath = GetCurrentLogFilePath();
+
+                Directory.CreateDirectory(
+                    Path.GetDirectoryName(logPath)!);
+
                 File.AppendAllText(
                     GetCurrentLogFilePath(), 
                     message + Environment.NewLine);
+            }
+
+            if (_appState!.LogErrorState is false)
+            {
+                _appState.SetErrorState(true);
             }
         }
 
@@ -44,7 +54,8 @@ namespace StarCitizen.Hal.Extractor.Services
             var currentDate = DateTime.UtcNow.ToString("yyyy-MM-dd");
 
             return Path.Combine(
-                _path, 
+                _appState!.LogPath!, 
+                "Logs",
                 $"halx_{currentDate}.log");
         }
     }

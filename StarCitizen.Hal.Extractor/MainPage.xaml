@@ -11,18 +11,26 @@
                     Dark={StaticResource BackgroundDark}}">
 
     <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Data.p4k" 
+        <ToolbarItem Text="Buy me a beer"                      
+                   ToolTipProperties.Text="If you like the app and want to show your appreciation :)"
+                     Command="{Binding LaunchBrowserCommand}"
+                     IsEnabled="true"/>
+        <ToolbarItem Text="Data.p4k"                      
+                   ToolTipProperties.Text="Set the path to the data.p4k file."
                      Command="{Binding ExtractionPathSelectionClickedCommand}"
                      IsEnabled="{Binding AreWeNotExtracting}"/>
 
         <ToolbarItem Text="Output folder" 
+                   ToolTipProperties.Text="Set the location of where you want to extract data to."
                      Command="{Binding OutputToPathSelectionClickedCommand}"
                      IsEnabled="{Binding AreWeNotExtracting}"/>
 
         <ToolbarItem Text="Reset" 
+                   ToolTipProperties.Text="Clear the extensions to extract list."
             Command="{Binding ResetExtractionListCommand}" />
-        
+
         <ToolbarItem Text="Extract" 
+                   ToolTipProperties.Text="Begin extracting stuff!"
             Command="{Binding BeginExtractingCommand}" />
 
     </ContentPage.ToolbarItems>
@@ -161,7 +169,7 @@
         </Grid>
 
         <Grid ColumnDefinitions="100,50,*,*,*,*" 
-              RowDefinitions="*,*,*"
+              RowDefinitions="*,*,*,*"
               Grid.Row="4" 
               Margin="0,20,0,0">
 
@@ -173,6 +181,7 @@
                    Grid.Row="0" />
 
             <Button Text="Cancel"
+                   ToolTipProperties.Text="Cancel the processing of data."
                 IsVisible="{Binding AreWeExtracting}"
                 IsEnabled="{Binding AreWeExtracting}"
                 Command="{Binding CancelExtractionCommand}"
@@ -222,6 +231,7 @@
                    Grid.Row="2" />
 
             <Label Text="Unknown extensions" 
+                   ToolTipProperties.Text="New extensions not seen before..."
                    FontSize="Caption" 
                    TextColor="{AppThemeBinding 
                         Light={StaticResource Secondary}, 
@@ -233,6 +243,7 @@
                    Grid.Row="1" />
 
             <Label Text="Update app!" 
+                   ToolTipProperties.Text="There is a new version available."
                    IsVisible="{Binding AreNewExtensionsFound}"
                    VerticalTextAlignment="Center" 
                    HorizontalTextAlignment="Start"
@@ -257,6 +268,7 @@
 
 
             <Label Text="Decompressed" 
+                   ToolTipProperties.Text="This number might not match the files extracted count. This is normal."
                    FontSize="Caption" 
                    TextColor="{AppThemeBinding 
                         Light={StaticResource Secondary}, 
@@ -267,10 +279,20 @@
                    Grid.Row="1"  />
 
             <Label Text="{Binding FilesConverted}" 
+                   ToolTipProperties.Text="This number might not match the files extracted count. This is normal."
                    VerticalTextAlignment="Center" 
                    HorizontalTextAlignment="End"
                    Grid.Column="5" 
                    Grid.Row="2" />
+
+            <Label Text="Possible errors. Check the log."
+                   ToolTipProperties.Text="Log can be found in the output folder."
+                   TextColor="{StaticResource Warning}"
+                   IsVisible="{Binding LogErrors}"
+                   HorizontalOptions="CenterAndExpand"
+                   VerticalOptions="StartAndExpand"
+                   Grid.ColumnSpan="6"
+                   Grid.Row="3" />
 
         </Grid>
 

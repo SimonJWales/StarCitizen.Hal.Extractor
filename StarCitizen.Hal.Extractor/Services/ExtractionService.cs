@@ -1,13 +1,18 @@
 ﻿
 using Hal.Extractor.Entities;
+using Microsoft.Extensions.Logging;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 
 namespace Hal.Extractor.Services;
 
-public class ExtractionService(AppState appState)
+public class ExtractionService(
+    AppState appState, 
+    ILogger log)
 {
     AppState? AppState { get; set; } = appState;
+
+    ILogger Log { get; set; } = log;
 
     /// <summary>
     /// Open the p4k file for reading and extraction of data
@@ -146,8 +151,9 @@ public class ExtractionService(AppState appState)
 
             if (!extractedOK)
             {
-                Debug.WriteLine(
-                    $"ERROR extracting {entry.Name}");
+                Log.LogWarning(
+                    "ERROR extracting {entry}", 
+                    entry.Name);
             }
         }
 
@@ -162,7 +168,7 @@ public class ExtractionService(AppState appState)
     /// <param name="entry"></param>
     /// <param name="buffer"></param>
     /// <returns></returns>
-    public static async Task<bool> ExtractFile(
+    public async Task<bool> ExtractFile(
         string filePath,
         ICSharpCode.SharpZipLib.Zip.ZipFile p4kArchive,
         ICSharpCode.SharpZipLib.Zip.ZipEntry entry,
@@ -189,7 +195,9 @@ public class ExtractionService(AppState appState)
         }
         catch (Exception ex)
         {
-            Debug.WriteLine("An error occurred: " + ex.Message);
+            Log.LogError(
+                "An error occurred:{ex}",
+                ex.Message);
         }
 
         return false;
@@ -203,7 +211,7 @@ public class ExtractionService(AppState appState)
     /// <param name="entry"></param>
     /// <param name="buffer"></param>
     /// <returns></returns>
-    static async Task<bool> ExtractFileAsync(
+    async Task<bool> ExtractFileAsync(
         string filePath,
         Stream p4kArchiveStream,
         ICSharpCode.SharpZipLib.Zip.ZipEntry entry,
@@ -237,7 +245,10 @@ public class ExtractionService(AppState appState)
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"ExtractFile exception while decompressing {entry.Name}: {ex}");
+            Log.LogError(
+                "ExtractFile exception while decompressing {entry}: {ex}",
+                entry.Name,
+                ex.Message);
 
             return false;
         }
