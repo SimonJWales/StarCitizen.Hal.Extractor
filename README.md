@@ -34,7 +34,7 @@ The Star Citizen HAL Extractor (HAL X for short) is a windows application that c
 ## Why do we need this?
 While [unp4k](https://github.com/dolkensp/unp4k) is terrific at getting the data out from the `Data.p4k` file and outputing user friendly objects, it does not seem to be updated or maintained.
 
-I wanted to create an easy to use web app that could give me useful information about where I could buy a particular item or what items that I could put in a specific vehicle - which became [sc-hal.com](https://sc-hal.com). 
+I wanted to create an easy to use web app that could give me useful information about where I could buy a particular item or what items that I could put in a specific vehicle - which became [sc-hal.com](https://sc-hal.com), which itself is still a work in progress. 
 
 Without the extraction and conversion tools the website would not be able to be updated, so I created the HAL Extractor to solve my problem. Maybe it can help you too. It is one of the applications I created for [sc-hal.com](https://sc-hal.com/) and it is offered here free in the hope someone else can benefit from it and why I made this repo public.
 
