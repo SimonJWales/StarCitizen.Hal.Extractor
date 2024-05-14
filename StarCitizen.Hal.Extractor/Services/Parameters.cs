@@ -26,6 +26,8 @@ namespace Hal.Extractor.Services
 
         public static readonly string VersionFile = "build_manifest.id";
 
+        public static readonly string VersionFileJson = "version.json";
+
         public static readonly string PickerP4K = "Select the Star Citizen Data.p4k file";
 
         public static readonly string ExtensionsFile = "Extensions.txt";

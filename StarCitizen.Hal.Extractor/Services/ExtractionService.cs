@@ -73,15 +73,35 @@ public class ExtractionService(
 
         VersionData versionData = await FileService.GetGameVersionData(p4kFile);
 
+        gameVersion = GetGameVersionFromManifest(
+            gameVersion, 
+            versionData);
+
+        string extraction = @$"{extractionPath}\{gameEnvironment}_{gameVersion}";
+
+        string versionOutputPath = @$"{extraction}\Version";
+
+        Directory.CreateDirectory(versionOutputPath);
+
+        await FileService.WriteTFile(
+            @$"{versionOutputPath}\{Parameters.VersionFileJson}",
+            versionData);
+
+        return extraction;
+    }
+
+    static string GetGameVersionFromManifest(
+        string gameVersion, 
+        VersionData versionData)
+    {
         StringBuilder version = new();
 
-        // Define a regex pattern to match full version numbers
         string pattern = @"\d+(\.\d+)*";
 
         if (versionData?.Data?.Branch is not null)
         {
             MatchCollection matches = Regex.Matches(
-                versionData.Data.Branch, 
+                versionData.Data.Branch,
                 pattern);
 
             foreach (Match match in matches.Cast<Match>())
@@ -115,7 +135,7 @@ public class ExtractionService(
             gameVersion = versionData.Data.Branch;
         }
 
-        return @$"{extractionPath}\{gameEnvironment}_{gameVersion}";
+        return gameVersion;
     }
 
     /// <summary>
