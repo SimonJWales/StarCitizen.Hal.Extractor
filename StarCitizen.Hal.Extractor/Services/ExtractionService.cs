@@ -3,10 +3,8 @@ using Hal.Extractor.Entities;
 using Microsoft.Extensions.Logging;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using static Android.Renderscripts.ScriptGroup;
 using System.Text.RegularExpressions;
 using System.Text;
-using Microsoft.Extensions.Primitives;
 
 namespace Hal.Extractor.Services;
 

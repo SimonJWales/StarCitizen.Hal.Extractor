@@ -1,15 +1,12 @@
 ﻿
-using CommunityToolkit.Mvvm.DependencyInjection;
 using ICSharpCode.SharpZipLib.Zip;
 using Microsoft.Extensions.Logging;
 using StarCitizen.Hal.Extractor.Library.Cry;
 using StarCitizen.Hal.Extractor.Library.Dolkens.Unforge;
 using StarCitizen.Hal.Extractor.Library.Enum;
-using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using System.Xml;
-using Windows.Devices.Geolocation;
 
 namespace Hal.Extractor.Services
 {
