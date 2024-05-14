@@ -71,9 +71,6 @@ namespace Hal.Extractor.Services
                     ".bnk",
                     ".ogg",
                     ".raw",
-                    ".svg",
-                    ".ttf",
-                    ".tiff",
                     ".wem"
                 }
             },
