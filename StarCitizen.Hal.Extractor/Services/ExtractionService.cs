@@ -3,11 +3,15 @@ using Hal.Extractor.Entities;
 using Microsoft.Extensions.Logging;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using static Android.Renderscripts.ScriptGroup;
+using System.Text.RegularExpressions;
+using System.Text;
+using Microsoft.Extensions.Primitives;
 
 namespace Hal.Extractor.Services;
 
 public class ExtractionService(
-    AppState appState, 
+    AppState appState,
     ILogger log)
 {
     AppState? AppState { get; set; } = appState;
@@ -29,7 +33,7 @@ public class ExtractionService(
         List<string>? extensions)                   // this is the list of extensions used for comparison for new file extensions
     {
         string extractTo = await GetFullExtractionPathFromGameVersionData(
-            path, 
+            path,
             extractionPath);
 
         return await Task.Run(async () =>
@@ -55,7 +59,7 @@ public class ExtractionService(
     }
 
     static async Task<string> GetFullExtractionPathFromGameVersionData(
-        string p4kFile, 
+        string p4kFile,
         string extractionPath)
     {
         string gameVersion = "UNKNOWN-GAME-VERSION";
@@ -71,12 +75,43 @@ public class ExtractionService(
 
         VersionData versionData = await FileService.GetGameVersionData(p4kFile);
 
-        if (versionData?.Data?.Version is not null)
+        StringBuilder version = new();
+
+        // Define a regex pattern to match full version numbers
+        string pattern = @"\d+(\.\d+)*";
+
+        if (versionData?.Data?.Branch is not null)
+        {
+            MatchCollection matches = Regex.Matches(
+                versionData.Data.Branch, 
+                pattern);
+
+            foreach (Match match in matches.Cast<Match>())
+            {
+                version.Append(match.Value);
+
+                version.Append('.');
+            }
+
+            if (versionData?.Data?.RequestedP4ChangeNum is not null)
+            {
+                version.Append(versionData.Data.RequestedP4ChangeNum);
+            }
+        }
+
+        if (!string.IsNullOrWhiteSpace(version.ToString()))
+        {
+            gameVersion = version.ToString();
+        }
+
+        if (string.IsNullOrWhiteSpace(version.ToString()) &&
+            versionData?.Data?.Version is not null)
         {
             gameVersion = versionData.Data.Version;
         }
 
-        if (versionData?.Data?.Version is null && 
+        if (string.IsNullOrWhiteSpace(version.ToString()) &&
+            versionData?.Data?.Version is null &&
             versionData?.Data?.Branch is not null)
         {
             gameVersion = versionData.Data.Branch;
@@ -114,10 +149,10 @@ public class ExtractionService(
 
             // more elegant than a scrappy linq query
             bool isValidExtension = (from extensionType in fileTypes
-                                         where entry.Name.ToLower().Contains(
-                                             extensionType,
-                                             StringComparison.CurrentCultureIgnoreCase)
-                                         select true)
+                                     where entry.Name.ToLower().Contains(
+                                         extensionType,
+                                         StringComparison.CurrentCultureIgnoreCase)
+                                     select true)
                                      .FirstOrDefault();
 
             var ext = Path.GetExtension(entry.Name);
@@ -152,7 +187,7 @@ public class ExtractionService(
             if (!extractedOK)
             {
                 Log.LogWarning(
-                    "ERROR extracting {entry}", 
+                    "ERROR extracting {entry}",
                     entry.Name);
             }
         }
@@ -182,9 +217,9 @@ public class ExtractionService(
             }
 
             bool result = await Task.Run(() => ExtractFileAsync(
-                filePath, 
-                p4kArchive.GetInputStream(entry), 
-                entry, 
+                filePath,
+                p4kArchive.GetInputStream(entry),
+                entry,
                 buffer));
 
             return result;
@@ -237,8 +272,8 @@ public class ExtractionService(
                 useAsync: true);
 
             await stream.CopyToAsync(
-                fileStream, 
-                buffer.Length, 
+                fileStream,
+                buffer.Length,
                 Parameters.CancelToken);
 
             return true;
