@@ -1,4 +1,6 @@
-![HAL X](https://badgen.net/badge/SC-HAL/Extractor/purple?icon=windows) ![Windows](https://badgen.net/badge/icon/windows?icon=windows&label) ![HAL X](https://badgen.net/github/release/SimonJWales/StarCitizen.Hal.Extractor/main) [![license](https://badgen.net/badge/license/BSD%203--Clause/blue)](ttps://github.com/SimonJWales/StarCitizen.Hal.Extractor/blob/main/LICENSE) ![Commits](https://badgen.net/github/commits/SimonJWales/StarCitizen.Hal.Extractor/main) ![HAL X](https://badgen.net/github/last-commit/SimonJWales/StarCitizen.Hal.Extractor/main) [![Buy Me a Coffee](https://badgen.net/badge/Support/Buymeacoffee/yellow?icon=buymeacoffee)](https://buymeacoffee.com/schal)
+![HAL X](https://badgen.net/badge/SC-HAL/Extractor/purple?icon=windows) ![Windows](https://badgen.net/badge/icon/windows?icon=windows&label) [![license](https://badgen.net/badge/license/BSD%203--Clause/blue)](ttps://github.com/SimonJWales/StarCitizen.Hal.Extractor/blob/main/LICENSE) 
+![Commits](https://badgen.net/github/commits/SimonJWales/StarCitizen.Hal.Extractor/main) ![Last commit](https://badgen.net/github/last-commit/SimonJWales/StarCitizen.Hal.Extractor/main) 
+[![Buy Me a Coffee](https://badgen.net/badge/Support/Buymeacoffee/yellow?icon=buymeacoffee)](https://buymeacoffee.com/schal)
 
 # Star Citizen Hal Extractor
 
@@ -18,6 +20,7 @@ The Star Citizen HAL Extractor (HAL X for short) is a windows application that c
 * Fork this repo if you want to play around with the code (and improve it)
 
 ## General Installation (standalone version)
+* If you don't want to dig around in the code and simply want to get the app running and the data out, then you can use the stand-alone version of HAL X
 * Get the latest free version of [HAL Extractor from the Microsoft Windows Store](https://www.microsoft.com/store/productId/9NFJWG6RNXRP?ocid=pdpshare)
 * Once installed, you can find the application in the apps list, as usual; Start > All > H > HAL Extractor
 
@@ -31,9 +34,9 @@ The Star Citizen HAL Extractor (HAL X for short) is a windows application that c
 ## Why do we need this?
 While [unp4k](https://github.com/dolkensp/unp4k) is terrific at getting the data out from the `Data.p4k` file and outputing user friendly objects, it does not seem to be updated or maintained.
 
-I wanted to create an easy to use web app that could give me useful information about where I could buy a particular item or what items that I could put in a specific vehicle - which became [sc-hal.com](https://sc-hal.com). 
+I wanted to create an easy to use web app that could give me useful information about where I could buy a particular item or what items that I could put in a specific vehicle - which became [sc-hal.com](https://sc-hal.com), which itself is still a work in progress. 
 
-Without the extraction and conversion tools the website would not be able to be updated, so I created the HAL Extractor to solve my problem. Maybe it can help you too. It is one of the applications I created for [sc-hal.com](https://sc-hal.com/) and it is offered here free in the hope someone else can benefit from it.
+Without the extraction and conversion tools the website would not be able to be updated, so I created the HAL Extractor to solve my problem. Maybe it can help you too. It is one of the applications I created for [sc-hal.com](https://sc-hal.com/) and it is offered here free in the hope someone else can benefit from it and why I made this repo public.
 
 A complete extraction (using default files) can take between 2 and 10 minutes (depending on your system). Around 1 minute to extract the files from the .p4k and the rest of the time converting the binary cryXML files to readable formats.
 
