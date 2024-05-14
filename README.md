@@ -40,6 +40,11 @@ Without the extraction and conversion tools the website would not be able to be 
 
 A complete extraction (using default files) can take between 2 and 10 minutes (depending on your system). Around 1 minute to extract the files from the .p4k and the rest of the time converting the binary cryXML files to readable formats.
 
+## Known issues
+App reports possible errors on extraction.
+    - This is unfortunately due to the fact some of the cryXml files have incorrect attribute values when trying to read the binary data. Files affacted are generally environmental files such as rain textures (though of course something is important to someone), it does not impact vehicle and item data or any graphics related files.
+
+    
 ---
 
 # Project links
